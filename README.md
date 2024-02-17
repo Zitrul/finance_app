@@ -1,1 +1,1 @@
-# finance_app
+# Money Minder
