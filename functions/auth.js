@@ -9,9 +9,9 @@ function generateAccessToken(user) {
 }
 
 async function createRefreshToken(user, db) {
-    return await db.RefreshToken.create({
+    return (await db.RefreshToken.create({
         token: jwt.sign(user, process.env.REFRESH_TOKEN_SECRET),
-    });
+    })).token;
 }
 
 module.exports = {

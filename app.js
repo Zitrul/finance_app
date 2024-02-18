@@ -35,7 +35,7 @@ app.post("/register", async (req, res) => {
             await bcrypt.hash(formPassword, salt).then(async function (hash) {
                 const [user, created] = await db.User.findOrCreate({
                     where: {
-                        [sequelize.or]: [
+                        [sequelize.Op.or]: [
                             { username: username },
                             { email: email },
                         ],
@@ -47,7 +47,10 @@ app.post("/register", async (req, res) => {
                     },
                 });
                 if (created) {
-                    return 
+                    return res.status(200).json("success");
+                }
+                else{
+                    return res.status(300).json("на чужое базаришься?");
                 }
             });
         });
@@ -62,7 +65,7 @@ app.post("/login", async (req, res) => {
     const user = { username: username };
 
     const userFound = await db.User.findOne({
-        where: Sequelize.or({ username: username }, { email: username }),
+        where: sequelize.or({ username: username }, { email: username }),
     });
 
     if (
