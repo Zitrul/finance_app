@@ -49,7 +49,7 @@ app.post("/register", async (req, res) => {
                 if (created) {
                     return res.status(200).json("success");
                 }
-                else{
+                else {
                     return res.status(300).json("на чужое базаришься?");
                 }
             });
