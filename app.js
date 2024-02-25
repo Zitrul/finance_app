@@ -62,6 +62,7 @@ app.post("/register", async (req, res) => {
     }
 });
 
+
 app.post("/login", async (req, res) => {
     const username = req.body.username;
     const user = { username: username };
@@ -82,6 +83,37 @@ app.post("/login", async (req, res) => {
         });
     } else {
         res.status(403);
+    }
+});
+
+
+app.post("/addTransaction", async (req, res) => {
+    const description = req.body.description;
+    const type = req.body.type;
+    const amount = parseFloat(req.body.amount);
+    const currency = req.body.currency;
+    try {
+        const transaction = await db.Transaction.findOrCreate({
+            where: {
+                [sequelize.Op.or]: [
+                    { description: description },
+                    { type: type },
+                    { amount: amount },
+                    { currency: currency }
+                ],
+            },
+            defaults: {
+                user_id: null,
+                description: description,
+                type: type,
+                amount: amount,
+                currency: currency
+            },
+        });
+        res.json(transaction.rows[0]);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
     }
 });
 

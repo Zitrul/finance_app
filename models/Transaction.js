@@ -5,21 +5,29 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true
         },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
         description: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         type: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         amount: {
             type: DataTypes.FLOAT,
-            allowNull: false
+            allowNull: true
         },
         currency: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
+        },
+        created_at: {
+            type: DataTypes.NOW,
+            allowNull: true
         }
     }, {
         freezeTableName: true,
