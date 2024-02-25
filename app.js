@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const auth = require("./functions/auth.js");
+const mid = require('./middlewares');
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
@@ -8,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const db = require("./models");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
 const sequelize = require("sequelize");
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
 // const fun = require("./functions");
@@ -16,11 +18,15 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
+app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "dist")));
 
 // app.get("*", (req, res) => {
 //   res.sendFile(path.join(__dirname, "dist", "index.html"));
 // });
+function authenticate(req, res, next) {
+    return mid.authenticate(req, res, next, db);
+}
 
 app.get("/", (req, res) => {
     res.send("123");
@@ -68,7 +74,7 @@ app.post("/login", async (req, res) => {
     const user = { username: username };
 
     const userFound = await db.User.findOne({
-        where: sequelize.or({ username: username }, { email: username }),
+        where: sequelize.or({ username: username }, { email_auth: username }),
     });
 
     if (
@@ -77,6 +83,8 @@ app.post("/login", async (req, res) => {
     ) {
         const accessToken = auth.generateAccessToken(user);
         const refreshToken = await auth.createRefreshToken(user, db);
+        res.cookie("accessToken", accessToken);
+        res.cookie("refreshToken", refreshToken);
         res.status(200).json({
             accessToken: accessToken,
             resfreshToken: refreshToken,
@@ -86,8 +94,13 @@ app.post("/login", async (req, res) => {
     }
 });
 
+app.post("/token-test", authenticate, (req, res) => {
+    res.status(200).json({
+        msg: "Authenticated!",
+    });
+});
 
-app.post("/addTransaction", async (req, res) => {
+app.post("/add-transaction", async (req, res) => {
     const description = req.body.description;
     const type = req.body.type;
     const amount = parseFloat(req.body.amount);
@@ -118,6 +131,7 @@ app.post("/addTransaction", async (req, res) => {
 });
 
 db.sequelize.sync().then((req) => {
+    process.env.db = db;
     app.listen(port, () => {
         console.log(`Server listened on port http://localhost:${port}`);
     });
