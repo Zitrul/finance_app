@@ -38,14 +38,14 @@ app.post("/register", async (req, res) => {
                         [sequelize.Op.or]: [
                             { username: username },
                             { email_auth: email },
-                            { telegram_bot_token: require('crypto').randomBytes(64).toString('hex') }
+                            { telegram_bot_token: require('crypto').randomBytes(32).toString('hex') }
                         ],
                     },
                     defaults: {
                         username: username,
                         email_auth: email,
                         password: hash.toString(),
-                        telegram_bot_token: require('crypto').randomBytes(64).toString('hex')
+                        telegram_bot_token: require('crypto').randomBytes(32).toString('hex')
                     },
                 });
                 if (created) {
