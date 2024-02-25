@@ -13,9 +13,33 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        email: {
+        first_name: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        last_name: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        telegram_auth: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        email_auth: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        telephone_number: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        telegram_bot_token: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        created_at: {
+            type: DataTypes.NOW,
+            allowNull: true
         }
     }, {
         freezeTableName: true,
