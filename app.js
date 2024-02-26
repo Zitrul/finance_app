@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const auth = require("./functions/auth.js");
-const mid = require('./middlewares');
+const mid = require("./middlewares");
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const db = require("./models");
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 const sequelize = require("sequelize");
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
 // const fun = require("./functions");
@@ -18,7 +18,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "dist")));
 
 // app.get("*", (req, res) => {
@@ -44,20 +44,25 @@ app.post("/register", async (req, res) => {
                         [sequelize.Op.or]: [
                             { username: username },
                             { email_auth: email },
-                            { telegram_bot_token: require('crypto').randomBytes(32).toString('hex') }
+                            {
+                                telegram_bot_token: require("crypto")
+                                    .randomBytes(32)
+                                    .toString("hex"),
+                            },
                         ],
                     },
                     defaults: {
                         username: username,
                         email_auth: email,
                         password: hash.toString(),
-                        telegram_bot_token: require('crypto').randomBytes(32).toString('hex')
+                        telegram_bot_token: require("crypto")
+                            .randomBytes(32)
+                            .toString("hex"),
                     },
                 });
                 if (created) {
                     return res.status(200).json("success");
-                }
-                else {
+                } else {
                     return res.status(300).json("на чужое базаришься?");
                 }
             });
@@ -67,7 +72,6 @@ app.post("/register", async (req, res) => {
         res.status(500).json("smth went wrong");
     }
 });
-
 
 app.post("/login", async (req, res) => {
     const username = req.body.username;
@@ -100,30 +104,32 @@ app.post("/token-test", authenticate, (req, res) => {
     });
 });
 
-app.post("/add-transaction", async (req, res) => {
-    const description = req.body.description;
-    const type = req.body.type;
-    const amount = parseFloat(req.body.amount);
-    const currency = req.body.currency;
+app.post("/add-transaction", authenticate, async (req, res) => {
     try {
-        const transaction = await db.Transaction.findOrCreate({
+        const user_id = req.user["id"];
+        const description = req.body.description;
+        const type = req.body.type;
+        const amount = parseFloat(req.body.amount);
+        const currency = req.body.currency;
+        const [transaction, created] = await db.Transaction.findOrCreate({
             where: {
                 [sequelize.Op.or]: [
-                    { description: description },
-                    { type: type },
-                    { amount: amount },
-                    { currency: currency }
+                    
                 ],
             },
             defaults: {
-                user_id: null,
+                user_id: user_id,
                 description: description,
                 type: type,
                 amount: amount,
-                currency: currency
+                currency: currency,
             },
         });
-        res.json(transaction.rows[0]);
+        if (created) {
+            res.status(200).json("succeeded");
+        } else {
+            res.status(300).json("failed");
+        }
     } catch (err) {
         console.log(err);
         res.status(500).json("smth went wrong");
