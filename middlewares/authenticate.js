@@ -24,7 +24,6 @@ function open(req, res, next, db) {
                 }
                 // Генерируем новый access token и продолжаем выполнение запроса
                 const newAccessToken = auth.generateAccessToken(user);
-                console.log(newAccessToken);
                 req.user = await db.User.findOne({ where: { username: user.username } });
                 res.cookie("accessToken", newAccessToken);
                 next();

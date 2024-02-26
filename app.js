@@ -111,25 +111,14 @@ app.post("/add-transaction", authenticate, async (req, res) => {
         const type = req.body.type;
         const amount = parseFloat(req.body.amount);
         const currency = req.body.currency;
-        const [transaction, created] = await db.Transaction.findOrCreate({
-            where: {
-                [sequelize.Op.or]: [
-                    
-                ],
-            },
-            defaults: {
-                user_id: user_id,
-                description: description,
-                type: type,
-                amount: amount,
-                currency: currency,
-            },
+        const transaction = await db.Transaction.create({
+            user_id: user_id,
+            description: description,
+            type: type,
+            amount: amount,
+            currency: currency,
         });
-        if (created) {
-            res.status(200).json("succeeded");
-        } else {
-            res.status(300).json("failed");
-        }
+        res.status(200).json("succeeded");
     } catch (err) {
         console.log(err);
         res.status(500).json("smth went wrong");
