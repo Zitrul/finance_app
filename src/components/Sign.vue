@@ -1,6 +1,5 @@
 <template>
-    <!-- <v-app>
-        <v-main> -->
+    <v-app>
         <v-container fluid fill-height v-if="signup_active">
             <v-row justify="center">
             <v-col></v-col>
@@ -36,12 +35,11 @@
                 </v-card>
             </v-col>
             <v-col>
-                <fa :icon="['fas', 'xmark']" class="cross_icon"/>
+                <font-awesome-icon :icon="['fas', 'xmark']" class="cross_icon"/>
             </v-col>
             </v-row>
         </v-container>
-        <!-- </v-main>
-    </v-app> -->
+    </v-app>
 </template>
   
 <script>

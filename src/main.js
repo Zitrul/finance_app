@@ -20,7 +20,7 @@ app.use(VueCookies);
 
 app.use(router)
   .use(vuetify)
-  .component('fa', FontAwesomeIcon)
+  .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');
 
 // axios.defaults.headers['admin_pass'] = `${app.$cookies.get('pass')}`;
