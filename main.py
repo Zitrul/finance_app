@@ -3,8 +3,11 @@ from typing import Union
 import uvicorn
 from fastapi import FastAPI, UploadFile, File
 from fastapi import UploadFile, File, Form
-from functions import CHECK_CHECKER
-from classes import stringa
+
+from DBmanager import DBmanager
+from functions import CHECK_CHECKER, auto_sort
+from classes import stringa, Product
+
 app = FastAPI()
 
 
@@ -12,6 +15,16 @@ app = FastAPI()
 def read_main(name : stringa):
     print(name)
     return {"Hello": "World"}
+@app.get("/add_product_user")
+def add_product(user_id: str, name: str, price: str,  quantity: str, cost: str, category: str, select_category: str):
+    product = [Product(name, price, quantity, cost, category)]
+    if select_category == "True":
+        product = auto_sort(product)
+    db = DBmanager()
+    db.add_products(product, int(user_id))
+    db.commit()
+    print(name, user_id)
+    return {"OK": "OK"}
 
 
 @app.get("/items/{item_id}")
