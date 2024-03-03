@@ -11,6 +11,9 @@ from classes import stringa, Product
 app = FastAPI()
 
 
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    return {"filename": file.filename}
 @app.get("/")
 def read_main(name : stringa):
     print(name)
