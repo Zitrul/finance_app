@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI, UploadFile, File
 from fastapi import UploadFile, File, Form
 import base64
+from threading import Thread
 from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
@@ -11,8 +12,17 @@ from functions import CHECK_CHECKER, auto_sort
 from classes import stringa, Product
 
 app = FastAPI()
-
-
+def write(base64_data):
+    import base64
+    from io import BytesIO
+    from PIL import Image
+    bytes_data = base64.b64decode(base64_data)
+    image_bytes = BytesIO(bytes_data)
+    
+    image = Image.open(image_bytes)
+    file_location = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+'.png'
+    image.save(file_location)
+    return file_location
 @app.get("/")
 def read_main(name : str):
     print(name)
@@ -41,13 +51,15 @@ async def create_upload_file(data: str):
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 @app.post("/check_bill")
-async def create_upload_file(base64_data:str, user_id: str, sort: str):
+def create_upload_file_2(base64_data:str = Form() , user_id: str = Form() , sort: str = Form() ):
+    
+    from PIL import Image
     bytes_data = base64.b64decode(base64_data)
     image_bytes = BytesIO(bytes_data)
+    
     image = Image.open(image_bytes)
     file_location = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+'.png'
     image.save(file_location)
-    print(uploaded_file)
     user_id = int(user_id)
     if sort == "True":
         sort = True
