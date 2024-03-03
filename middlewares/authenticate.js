@@ -12,6 +12,7 @@ function open(req, res, next, db) {
         if (err) {
             console.log("youuu");
             // Access token недействителен, проверяем наличие refresh token
+            console.log(req.cookies)
             const refreshToken = req.cookies.refreshToken;
             if (!refreshToken) {
                 return res.sendStatus(403); // Нет refresh token
@@ -19,7 +20,7 @@ function open(req, res, next, db) {
 
             // Проверяем действительность refresh token
             jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
-                if (err || !( auth.checkRefreshToken(user.username, refreshToken, db) ) ) {
+                if (err || !(await auth.checkRefreshToken(user.username, refreshToken, db) ) ) {
                     return res.sendStatus(403); // Недействительный refresh token
                 }
                 // Генерируем новый access token и продолжаем выполнение запроса

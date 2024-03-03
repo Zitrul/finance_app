@@ -11,12 +11,14 @@ const db = require("./models");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const sequelize = require("sequelize");
+const cors = require('cors');
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
 // const fun = require("./functions");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors())
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "dist")));
@@ -91,14 +93,14 @@ app.post("/login", async (req, res) => {
         res.cookie("refreshToken", refreshToken);
         res.status(200).json({
             accessToken: accessToken,
-            resfreshToken: refreshToken,
+            refreshToken: refreshToken,
         });
     } else {
-        res.status(403);
+        res.sendStatus(403);
     }
 });
 
-app.post("/token-test", authenticate, (req, res) => {
+app.get("/token-test", authenticate, (req, res) => {
     res.status(200).json({
         msg: "Authenticated!",
     });

@@ -28,9 +28,11 @@ async function checkRefreshToken(username, refreshToken, db) {
     const token = await db.RefreshToken.findOne({
         where: {
             username: username,
+            token: refreshToken
         },
     });
-    return (token != null && token.token == refreshToken);
+    console.log(token);
+    return (token != null);
 }
 
 module.exports = {
