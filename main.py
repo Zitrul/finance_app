@@ -16,10 +16,13 @@ def read_main(name : stringa):
     print(name)
     return {"Hello": "World"}
 @app.get("/add_product_user")
-def add_product(user_id: str, name: str, price: str,  quantity: str, cost: str, category: str, select_category: str):
-    product = [Product(name, price, quantity, cost, category)]
+def add_product(user_id: str, name: str, amount: str, category: str, currency: str, select_category: str):
+    product = [Product(name, amount, currency, category)]
     if select_category == "True":
         product = auto_sort(product)
+    else:
+        if product[0].category == "":
+            product[0].category = "Остальное"
     db = DBmanager()
     db.add_products(product, int(user_id))
     db.commit()
@@ -37,7 +40,9 @@ async def create_upload_file(uploaded_file: UploadFile = File(), user_id: str = 
         sort = True
     else:
         sort = False
-    file_location = f"{datetime.datetime.now()}{uploaded_file.filename}"
+
+    file_location = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + uploaded_file.filename
+
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
 
