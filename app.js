@@ -11,15 +11,18 @@ const db = require("./models");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const sequelize = require("sequelize");
-const cors = require('cors');
-const axios = require('axios');
+const cors = require("cors");
+const axios = require("axios");
+const upload = require("express-fileupload");
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
 // const fun = require("./functions");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors())
+app.use(cors());
+app.use(upload());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "dist")));
@@ -40,13 +43,14 @@ app.post("/register", async (req, res) => {
         const username = req.body.username;
         const email = req.body.email;
         const formPassword = req.body.password;
-        await bcrypt.genSalt().then(async function (salt) { // hash password
+        await bcrypt.genSalt().then(async function (salt) {
+            // hash password
             await bcrypt.hash(formPassword, salt).then(async function (hash) {
                 const [user, created] = await db.User.findOrCreate({
                     where: {
                         [sequelize.Op.or]: [
                             { username: username }, // trying to find existing user
-                            { email_auth: email }
+                            { email_auth: email },
                         ],
                     },
                     defaults: {
@@ -121,6 +125,50 @@ app.post("/add-transaction", authenticate, async (req, res) => {
         console.log(err);
         res.status(500).json("smth went wrong");
     }
+});
+
+app.post("/scan-qr", async (req, res) => {
+    try {
+        const image = req.files.img;
+        const buf = image.data
+        const base64Data = buf.toString("base64");
+        const json = { data: base64Data };
+
+        url = "http://188.244.45.227:3214/check_bill"
+
+        const formData = new FormData();
+        formData.append("base64_data", json.data);
+        formData.append("user_id", "2");
+        formData.append("sort", "True");
+        
+        axios
+            .post(url, formData, {
+                headers: {
+                    "Content-Type": `multipart/form-data`,
+                },
+            })
+            .then((response) => {
+                console.log("Данные:", response.data);
+                res.send("Файл успешно загружен!");
+            })
+            .catch((error) => {
+                console.error("Ошибка:", error);
+                res.status(500).send("Ошибка загрузки файла! 2853");
+            });
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+app.get("/check-api", (req, res) => {
+    axios
+        .get("http://188.244.45.227:3214/?name=a")
+        .then((response) => {
+            res.json(response.data);
+        })
+        .catch((error) => {
+            res.json("smth went wrong");
+        });
 });
 
 db.sequelize.sync().then((req) => {
