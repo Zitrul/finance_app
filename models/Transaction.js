@@ -9,16 +9,16 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        description: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        type: {
+        name: {
             type: DataTypes.STRING,
             allowNull: true
         },
         amount: {
             type: DataTypes.FLOAT,
+            allowNull: true
+        },
+        category: {
+            type: DataTypes.STRING,
             allowNull: true
         },
         currency: {

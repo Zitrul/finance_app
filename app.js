@@ -12,6 +12,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const sequelize = require("sequelize");
 const cors = require('cors');
+const axios = require('axios');
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
 // const fun = require("./functions");
 
@@ -39,18 +40,13 @@ app.post("/register", async (req, res) => {
         const username = req.body.username;
         const email = req.body.email;
         const formPassword = req.body.password;
-        await bcrypt.genSalt().then(async function (salt) {
+        await bcrypt.genSalt().then(async function (salt) { // hash password
             await bcrypt.hash(formPassword, salt).then(async function (hash) {
                 const [user, created] = await db.User.findOrCreate({
                     where: {
                         [sequelize.Op.or]: [
-                            { username: username },
-                            { email_auth: email },
-                            {
-                                telegram_bot_token: require("crypto")
-                                    .randomBytes(32)
-                                    .toString("hex"),
-                            },
+                            { username: username }, // trying to find existing user
+                            { email_auth: email }
                         ],
                     },
                     defaults: {
@@ -85,7 +81,7 @@ app.post("/login", async (req, res) => {
 
     if (
         userFound &&
-        (await bcrypt.compare(req.body.password, userFound.password))
+        (await bcrypt.compare(req.body.password, userFound.password)) // comparing hashes of passwords
     ) {
         const accessToken = auth.generateAccessToken(user);
         const refreshToken = await auth.createRefreshToken(user, db);
@@ -109,15 +105,15 @@ app.get("/token-test", authenticate, (req, res) => {
 app.post("/add-transaction", authenticate, async (req, res) => {
     try {
         const user_id = req.user["id"];
-        const description = req.body.description;
-        const type = req.body.type;
+        const name = req.body.name;
         const amount = parseFloat(req.body.amount);
+        const category = req.body.category;
         const currency = req.body.currency;
         const transaction = await db.Transaction.create({
             user_id: user_id,
-            description: description,
-            type: type,
+            name: name,
             amount: amount,
+            category: category,
             currency: currency,
         });
         res.status(200).json("succeeded");
