@@ -127,7 +127,7 @@ app.post("/add-transaction", authenticate, async (req, res) => {
     }
 });
 
-app.post("/scan-qr", async (req, res) => {
+app.post("/scan-qr", authenticate, async (req, res) => {
     try {
         const image = req.files.img;
         const buf = image.data
@@ -138,7 +138,7 @@ app.post("/scan-qr", async (req, res) => {
 
         const formData = new FormData();
         formData.append("base64_data", json.data);
-        formData.append("user_id", "2");
+        formData.append("user_id", req.user["id"].toString());
         formData.append("sort", "True");
         
         axios
