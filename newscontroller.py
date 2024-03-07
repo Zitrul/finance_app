@@ -1,23 +1,35 @@
 import requests
 from bs4 import BeautifulSoup as BS
 import time
-
-from DBmanager import DBmanager
+#from special_info import comp as companies
+import DBmanager
 
 
 def read_news(url,time):
-    response = [url, time]
+    desc = ""
+    company = ""
     r = requests.get(url)
     soup = BS(r.text, 'html.parser')
     theme1 = soup.find_all("h3")
     if len(theme1) > 1:
-        response.append(str(theme1[1]).replace("<h3>","").replace("</h3>",""))
+        desc = str(theme1[1]).replace("<h3>","").replace("</h3>","")
+        n = len(desc)
+        #print(desc)
+        for j in range(n):
+            if desc[n-j-1] == '-':
+                #print(n-j-1)
+                company = desc[0:n-j-1]
+        print(company)
+        if company == "":
+            return 0
+
+
     else:
         return 0
-    print(response)
-    #db = DBmanager()
-    #db.add_news(response[0], response[1], response[2], response[3])
-    #db.commit()
+    response = [company,url,desc,time]
+    db = DBmanager.DBmanager()
+    db.add_news(response[0], response[1], response[2], response[3])
+    db.commit()
     return response
 def check_news():
     nocheck = []
@@ -54,6 +66,7 @@ def check_company():
         soup = BS(str(teme[0]), 'html.parser')
         teme1 = soup.find_all("a")
         #print(teme)
+        print("OK@")
         spisok = []
         spisok_time = []
         for i in teme1:
@@ -69,6 +82,6 @@ def check_company():
         #for i in range(len(spisok)):
         #   read_news(spisok[i], spisok_time[i])
         #time.sleep(120)
-check_company()
+#check_company()
 
-#check_news()
+check_news()
