@@ -34,7 +34,11 @@ def read_news(url,time):
 def check_news():
     nocheck = []
     while True:
+        db = DBmanager.DBmanager()
+        links = db.get_link_news()
 
+        #print(links)
+        db.commit()
         url = "https://www.disclosure.ru/rus/corpnews/index.shtml"
         r = requests.get(url)
         soup = BS(r.text, 'html.parser')
@@ -46,39 +50,16 @@ def check_news():
         spisok_time = []
         for i in teme1:
             if "news.shtml?newsisn" in  i['href']:
-                soup = BS(str(i), 'html.parser')
-                news_date = str(soup.find_all("b")[0]).replace("<b>","").replace("</b>","")
-                spisok_time.append(news_date)
-                spisok.append("https://www.disclosure.ru/rus/corpnews/"+i['href'])
+                if ("https://www.disclosure.ru/rus/corpnews/"+i['href'],) not in links:
+                    soup = BS(str(i), 'html.parser')
+                    news_date = str(soup.find_all("b")[0]).replace("<b>","").replace("</b>","")
+                    spisok_time.append(news_date)
+                    spisok.append("https://www.disclosure.ru/rus/corpnews/"+i['href'])
         print(spisok)
         print(spisok_time)
         for i in range(len(spisok)):
             read_news(spisok[i], spisok_time[i])
         time.sleep(120)
-def check_company():
-    nocheck = []
-    while True:
-
-        url = "http://www.disclosure.ru/issuer/index.shtml"
-        r = requests.get(url)
-        soup = BS(r.text, 'html.parser')
-        teme = soup.find_all("table")
-        soup = BS(str(teme[0]), 'html.parser')
-        teme1 = soup.find_all("a")
-        #print(teme)
-        print("OK@")
-        spisok = []
-        spisok_time = []
-        for i in teme1:
-
-            soup = BS(str(i), 'html.parser')
-            if len(soup.find_all("b")) > 0:
-                news_date = str(soup.find_all("b")[0]).replace("<b>","").replace("</b>","")
-                spisok_time.append(news_date.replace("\r","").replace("\n","")[1:])
-                #spisok.append("https://www.disclosure.ru/rus/corpnews/"+i['href'])
-        print(spisok)
-        print(spisok_time)
-        break
         #for i in range(len(spisok)):
         #   read_news(spisok[i], spisok_time[i])
         #time.sleep(120)
