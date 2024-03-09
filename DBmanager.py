@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pymysql.cursors
 
 
@@ -14,13 +16,14 @@ class DBmanager:
         self.cur = self.conn.cursor()
 
     def add_products(self, products_list, user_id):
-        for product_name in products_list:
-            product = products_list[product_name]
+        for product in products_list:
             print(product)
-            sql = "INSERT INTO Transaction (description, type, amount, currency, sum, user_id) VALUES (%s,%s, %s,%s, %s, %s)"
-            val = (
-            product_name, product["category"], float(product["quantity"]), str(product["price"]), str(product["cost"]),
-            user_id)
+            sql = "INSERT INTO Transaction (description, type, amount, currency, user_id) VALUES (%s,%s, %s, %s, %s)"
+            val = (str(product.name), str(product.category), float(product.quantity), str(product.cost), user_id)
+            sql = "INSERT INTO Transaction (name, category, amount, currency, user_id, created_at, updated_at) VALUES (%s,%s, %s, %s, %s, %s,%s)"
+            val = (str(product.name), str(product.category), str(product.price), str(product.currency), user_id,
+                   datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+                   datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
             self.cur.execute(sql, val)
 
         return "OK"
@@ -44,6 +47,9 @@ class DBmanager:
         for elm in list_to_update:
             sql = f"UPDATE LatestNews SET send_in_telegram=true WHERE id={int(elm)};"
             self.cur.execute(sql)
+    def update_news_true(self):
 
+        sql = f"UPDATE LatestNews SET send_in_telegram=false WHERE id={int(34)};"
+        self.cur.execute(sql)
     def commit(self):
         self.conn.commit()
