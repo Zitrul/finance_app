@@ -20,7 +20,16 @@ const upload = require("express-fileupload");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+// app.use(cors());
+app.use(function (req, res, next) {
+    // Enabling CORS
+    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization, refreshToken");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Credentials", true);
+    next();
+});
+
 app.use(upload());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
