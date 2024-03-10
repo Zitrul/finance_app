@@ -14,6 +14,7 @@ const sequelize = require("sequelize");
 const cors = require("cors");
 const axios = require("axios");
 const upload = require("express-fileupload");
+const { periodToMiliseconds } = require("./functions/functions.js");
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
 // const fun = require("./functions");
 
@@ -24,8 +25,14 @@ const port = process.env.PORT || 3000;
 app.use(function (req, res, next) {
     // Enabling CORS
     res.header("Access-Control-Allow-Origin", "http://localhost:8080");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization, refreshToken");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, authorization, refreshToken"
+    );
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS"
+    );
     res.header("Access-Control-Allow-Credentials", true);
     next();
 });
@@ -139,17 +146,17 @@ app.post("/add-transaction", authenticate, async (req, res) => {
 app.post("/scan-qr", authenticate, async (req, res) => {
     try {
         const image = req.files.img;
-        const buf = image.data
+        const buf = image.data;
         const base64Data = buf.toString("base64");
         const json = { data: base64Data };
 
-        url = "http://188.244.45.227:3214/check_bill"
+        url = "http://188.244.45.227:3214/check_bill";
 
         const formData = new FormData();
         formData.append("base64_data", json.data);
         formData.append("user_id", req.user["id"].toString());
         formData.append("sort", "True");
-        
+
         axios
             .post(url, formData, {
                 headers: {
@@ -178,6 +185,48 @@ app.get("/check-api", (req, res) => {
         .catch((error) => {
             res.json("smth went wrong");
         });
+});
+
+app.get("/all-transactions", async (req, res) => {
+    const period = req.body.period; // day | month | 3 months | 6 months | year | all
+    let miliseconds = periodToMiliseconds(period); // how many miliseconds fit in this period
+
+    const transactions = await db.Transaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+        },
+    });
+    res.json(transactions.reverse());
+});
+
+app.get("/transactions-by-category", async (req, res) => {
+    const period = req.body.period; // day | month | 3 months | 6 months | year | all
+    let miliseconds = periodToMiliseconds(period); // how many miliseconds fit in this period
+
+    const transactions = await db.Transaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+        },
+    });
+
+    let result = {}; // how much money wasted on every category in exact period
+    for (let i = 0; i < transactions.length; i++) {
+        if (
+            result[transactions[i].category] == null ||
+            result[transactions[i].category] == undefined
+        ) {
+            result[transactions[i].category] = 0;
+        }
+        result[transactions[i].category] += transactions[i].amount;
+    }
+
+    res.json(result);
 });
 
 db.sequelize.sync().then((req) => {
