@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const auth = require("./functions/auth.js");
+const functions = require("./functions/functions.js");
 const mid = require("./middlewares");
 const express = require("express");
 const fs = require("fs");
@@ -189,44 +190,36 @@ app.get("/check-api", (req, res) => {
 
 app.get("/all-transactions", async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
-    let miliseconds = periodToMiliseconds(period); // how many miliseconds fit in this period
+    const transactions = await functions.transactionsByPeriod(period);
 
-    const transactions = await db.Transaction.findAll({
-        where: {
-            created_at: {
-                [sequelize.Op.lt]: new Date(),
-                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
-            },
-        },
-    });
-    res.json(transactions.reverse());
+    res.json(transactions);
 });
 
-app.get("/transactions-by-category", async (req, res) => {
+app.get("/categories-amounts", async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
-    let miliseconds = periodToMiliseconds(period); // how many miliseconds fit in this period
+    const transactions = await functions.transactionsByPeriod(period);
 
-    const transactions = await db.Transaction.findAll({
-        where: {
-            created_at: {
-                [sequelize.Op.lt]: new Date(),
-                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
-            },
-        },
-    });
-
-    let result = {}; // how much money wasted on every category in exact period
-    for (let i = 0; i < transactions.length; i++) {
-        if (
-            result[transactions[i].category] == null ||
-            result[transactions[i].category] == undefined
-        ) {
-            result[transactions[i].category] = 0;
-        }
-        result[transactions[i].category] += transactions[i].amount;
-    }
+    let result = functions.categoriesAmounts(transactions);
 
     res.json(result);
+});
+
+app.get("/bar-chart", async (req, res) => {
+    const period = req.body.period; // day | month | 3 months | 6 months | year | all
+    const transactions = await functions.transactionsByPeriod(period);
+    const amounts = functions.categoriesAmounts(transactions);
+
+    let top6categories = functions.top6Categories(amounts);
+
+    res.json(top6categories);
+});
+
+app.get("/pie-chart", async (req, res) => { //! same as /transactions-by-category
+    const period = req.body.period; // day | month | 3 months | 6 months | year | all
+    const transactions = await functions.transactionsByPeriod(period);
+    const amounts = functions.categoriesAmounts(transactions);
+
+    res.json(amounts);
 });
 
 db.sequelize.sync().then((req) => {
