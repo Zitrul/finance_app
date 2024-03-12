@@ -204,7 +204,7 @@ app.get("/categories-amounts", async (req, res) => {
     res.json(result);
 });
 
-app.get("/bar-chart", async (req, res) => {
+app.post("/bar-chart", async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const transactions = await functions.transactionsByPeriod(period);
     const amounts = functions.categoriesAmounts(transactions);
@@ -214,7 +214,7 @@ app.get("/bar-chart", async (req, res) => {
     res.json(top6categories);
 });
 
-app.get("/pie-chart", async (req, res) => { //! same as /transactions-by-category
+app.post("/pie-chart", async (req, res) => { //! same as /transactions-by-category
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const transactions = await functions.transactionsByPeriod(period);
     const amounts = functions.categoriesAmounts(transactions);

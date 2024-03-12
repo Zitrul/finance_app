@@ -50,11 +50,35 @@ function categoriesAmounts(transactions) {
     return result;
 }
 
+function rearrangeObject(obj) {
+    const keys = Object.keys(obj);
+    let mid = Math.ceil(keys.length / 2);
+    if(keys.length % 2 == 0) mid += 1;
+    
+    let newObj = {};
+    
+    console.log(obj);
+    for (let i = 0; i < mid - 1; i++) {
+        if(i % 2 == 0) newObj[keys[mid + i - 1]] = obj[keys[mid + i - 1]];
+        else newObj[keys[i]] = obj[keys[i]];
+        console.log(`first ${i}`);
+    }
+    console.log(newObj);
+    for (let i = mid - 1; i < keys.length; i++) {
+        if(i % 2 == 1) newObj[keys[i - mid + 1]] = obj[keys[i - mid + 1] ];
+        else newObj[keys[i]] = obj[keys[i]];
+        console.log(`second ${i}; ${keys[i - mid + 1]}`);
+    }
+    console.log(newObj);
+    
+    return newObj;
+  }
+
 function top6Categories(amounts) {
     const entries = Object.entries(amounts);
     entries.sort((a, b) => b[1] - a[1]);
     const sortedObject = Object.fromEntries(entries);
-    const top6 = Object.keys(sortedObject)
+    let top6 = Object.keys(sortedObject)
         .slice(0, 6)
         .reduce((result, key) => {
             result[key] = sortedObject[key];
@@ -62,7 +86,7 @@ function top6Categories(amounts) {
             return result;
         }, {});
 
-    return top6;
+    return rearrangeObject(top6);
 }
 
 module.exports = {
