@@ -141,9 +141,9 @@ async def create_upload_file(uploaded_file: UploadFile = File(), user_id: str = 
 
 
 @app.get("/get_history")
-async def get_history_method(ticket: str, date_from: str):
+async def get_history_method(ticker: str, date_from: str):
     current_date = datetime.now().strftime('%Y-%m-%d')
-    result = get_history(ticket= ticket, date_end=current_date, date_start=date_from)
+    result = get_history(ticket= ticker, date_end=current_date, date_start=date_from)
     return result
 
 
