@@ -8,8 +8,9 @@ from threading import Thread
 from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
-from functions import CHECK_CHECKER, auto_sort
+from functions import *
 from classes import stringa, Product
+
 
 first_time_tg = ""
 first_time = ""
@@ -50,6 +51,20 @@ def add_product(user_id: str, name: str, amount: str, category: str, currency: s
     return {"OK": "OK"}
 
 
+@app.get("/add_user_assets")
+def add_user_assets(user_id: str, company_name: str, asset_amount: str, news_subscription: str, stock_quote: str):
+    db = DBmanager()
+    db.add_users_asset(company_name, news_subscription, user_id, asset_amount, stock_quote)
+    db.commit()
+    return {"OK": "OK"}
+
+
+@app.get("/get_qr_info")
+def add_user_assets(user_id: str, qr_data: str, auto_sort: str):
+    response = add_by_qr_info(auto_change= auto_sort, user_id=int(user_id), qr_data= qr_data)
+    return {"info": response}
+
+
 @app.get("/get_last_news_tg")
 def get_last_news_tg():
     db = DBmanager()
@@ -70,12 +85,17 @@ def get_last_news_tg():
     return response
 
 
-@app.post("/uploadfile/")
-async def create_upload_file(data: str):
-    print(data)
-    with open('image.jpeg', "wb+") as file_object:
-        file_object.write(data.encode('utf-8'))
-    return {"filename": 'ok'}
+@app.get("/get_users_subscription")
+def get_users_subscription():
+    db = DBmanager()
+    subs = db.get_users_assets()
+    db.commit()
+    response = dict()
+    response["subs"] = subs
+    for i in subs:
+        response["subs"].append(i[0])
+    return response
+
 
 
 @app.get("/items/{item_id}")
@@ -120,8 +140,13 @@ async def create_upload_file(uploaded_file: UploadFile = File(), user_id: str = 
     return {"info": result}
 
 
+@app.get("/get_history")
+async def get_history_method(ticket: str, date_from: str):
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    result = get_history(ticket= ticket, date_end=current_date, date_start=date_from)
+    return result
+
+
 if __name__ == "__main__":
 
-    first_time = str(str(datetime.date.today()).replace("-", ".")) + " " + str(datetime.datetime.now().time()).split(".")[0]
-    first_time_tg = str(str(datetime.date.today()).replace("-", ".")) + " " + str(datetime.datetime.now().time()).split(".")[0]
     uvicorn.run(app, host="0.0.0.0", port=3214)
