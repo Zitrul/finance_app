@@ -8,7 +8,7 @@ from threading import Thread
 from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
-from functions import *
+from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_sort
 from classes import stringa, Product
 
 
