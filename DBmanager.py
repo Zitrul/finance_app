@@ -49,5 +49,17 @@ class DBmanager:
 
         sql = f"UPDATE LatestNews SET send_in_telegram=false WHERE id={int(34)};"
         self.cur.execute(sql)
+
+    def get_users_assets(self):
+        sql = "SELECT company_name FROM UserAssets WHERE news_subscription = true;"
+        self.cur.execute(sql)
+        companies = self.cur.fetchall()
+        return companies
+
+    def add_users_asset(self, company_name,news_subscription, user_id, asset_amount,stock_quote):
+        sql = "INSERT INTO UserAssets (company_name, news_subscription, user_id, asset_amount, created_at, stock_quote ) VALUES (%s, %s, %s, %s, %s, %s);"
+        self.cur.execute(sql, (company_name, news_subscription, user_id, asset_amount, datetime.datetime().strftime("%Y-%m-%d_%H-%M-%S")), stock_quote)
+        companies = self.cur.fetchall()
+        return companies
     def commit(self):
         self.conn.commit()
