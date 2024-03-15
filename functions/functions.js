@@ -94,23 +94,23 @@ async function spendingsByPeriod(period, user_id) {
     let spendings = {};
     if (period === "day") {
         for (let i = 1; i < 25; i += 2) {
-            spendings[`${i} hrs ago`] = await spendingsBy2Hours(i, user_id);
+            spendings[`${i} часов назад`] = await spendingsBy2Hours(i, user_id);
         }
     } else if (period === "month") {
         for (let i = 1; i < 31; i += 2) {
-            spendings[`${i} days ago`] = await spendingsBy2Days(i, user_id);
+            spendings[`${i} дней назад`] = await spendingsBy2Days(i, user_id);
         }
     } else if (period === "3 months") {
         for (let i = 1; i < 13; i++) {
-            spendings[`${i} weeks ago`] = await spendingsByWeek(i, user_id);
+            spendings[`${i} недель назад`] = await spendingsByWeek(i, user_id);
         }
     } else if (period === "6 months") {
         for (let i = 1; i < 25; i += 2) {
-            spendings[`${i} weeks ago`] = await spendingsBy2Weeks(i, user_id);
+            spendings[`${i} недель назад`] = await spendingsBy2Weeks(i, user_id);
         }
     } else if (period === "year") {
         for (let i = 1; i < 13; i++) {
-            spendings[`${i} months ago`] = await spendingsByMonth(i, user_id);
+            spendings[`${i} месяцев назад`] = await spendingsByMonth(i, user_id);
         }
     }
 

@@ -120,6 +120,7 @@ app.post("/login", async (req, res) => {
 app.get("/token-test", authenticate, (req, res) => {
     res.status(200).json({
         msg: "Authenticated!",
+        user: req.user,
     });
 });
 
