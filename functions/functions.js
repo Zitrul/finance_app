@@ -20,15 +20,16 @@ function periodToMiliseconds(period) {
     return miliseconds;
 }
 
-async function transactionsByPeriod(period) {
+async function transactionsByPeriod(period, user_id) {
     let miliseconds = periodToMiliseconds(period); // how many miliseconds fit in this period
 
     const transactions = await db.Transaction.findAll({
         where: {
             created_at: {
                 [sequelize.Op.lt]: new Date(),
-                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds), 
             },
+            user_id: user_id,
         },
     });
 
@@ -53,26 +54,26 @@ function categoriesAmounts(transactions) {
 function rearrangeObject(obj) {
     const keys = Object.keys(obj);
     let mid = Math.ceil(keys.length / 2);
-    if(keys.length % 2 == 0) mid += 1;
-    
+    if (keys.length % 2 == 0) mid += 1;
+
     let newObj = {};
-    
-    console.log(obj);
+
+    // console.log(obj);
     for (let i = 0; i < mid - 1; i++) {
-        if(i % 2 == 0) newObj[keys[mid + i - 1]] = obj[keys[mid + i - 1]];
+        if (i % 2 == 0) newObj[keys[mid + i - 1]] = obj[keys[mid + i - 1]];
         else newObj[keys[i]] = obj[keys[i]];
-        console.log(`first ${i}`);
+        // console.log(`first ${i}`);
     }
-    console.log(newObj);
+    // console.log(newObj);
     for (let i = mid - 1; i < keys.length; i++) {
-        if(i % 2 == 1) newObj[keys[i - mid + 1]] = obj[keys[i - mid + 1] ];
+        if (i % 2 == 1) newObj[keys[i - mid + 1]] = obj[keys[i - mid + 1]];
         else newObj[keys[i]] = obj[keys[i]];
-        console.log(`second ${i}; ${keys[i - mid + 1]}`);
+        // console.log(`second ${i}; ${keys[i - mid + 1]}`);
     }
-    console.log(newObj);
-    
+    // console.log(newObj);
+
     return newObj;
-  }
+}
 
 function top6Categories(amounts) {
     const entries = Object.entries(amounts);
@@ -89,8 +90,146 @@ function top6Categories(amounts) {
     return rearrangeObject(top6);
 }
 
+async function spendingsByPeriod(period, user_id) {
+    let spendings = {};
+    if (period === "day") {
+        for (let i = 1; i < 25; i += 2) {
+            spendings[`${i} hrs ago`] = await spendingsBy2Hours(i, user_id);
+        }
+    } else if (period === "month") {
+        for (let i = 1; i < 31; i += 2) {
+            spendings[`${i} days ago`] = await spendingsBy2Days(i, user_id);
+        }
+    } else if (period === "3 months") {
+        for (let i = 1; i < 13; i++) {
+            spendings[`${i} weeks ago`] = await spendingsByWeek(i, user_id);
+        }
+    } else if (period === "6 months") {
+        for (let i = 1; i < 25; i += 2) {
+            spendings[`${i} weeks ago`] = await spendingsBy2Weeks(i, user_id);
+        }
+    } else if (period === "year") {
+        for (let i = 1; i < 13; i++) {
+            spendings[`${i} months ago`] = await spendingsByMonth(i, user_id);
+        }
+    }
+
+    return spendings;
+}
+
+async function spendingsBy2Days(days_ago, user_id) {
+    const day = 24 * 60 * 60 * 1000;
+    const miliseconds = day * days_ago; // how many miliseconds fit in this period
+
+    const transactions = await db.Transaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(new Date() - miliseconds + 2 * day),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+            user_id: user_id,
+        },
+    });
+
+    let spendings = 0;
+    for (let i = 0; i < transactions.length; i++) {
+        spendings += transactions[i]["amount"];
+    }
+
+    return spendings;
+}
+
+async function spendingsBy2Hours(hours_ago, user_id) {
+    const hour = 60 * 60 * 1000;
+    const miliseconds = hour * hours_ago; // how many miliseconds fit in this period
+
+    const transactions = await db.Transaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(new Date() - miliseconds + 2 * hour),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+            user_id: user_id,
+        },
+    });
+
+    let spendings = 0;
+    for (let i = 0; i < transactions.length; i++) {
+        spendings += transactions[i]["amount"];
+    }
+
+    return spendings;
+}
+
+async function spendingsByWeek(weeks_ago, user_id) {
+    const week_in_ms = 7 * 24 * 60 * 60 * 1000;
+    const miliseconds = week_in_ms * weeks_ago; // how many miliseconds fit in this period
+
+    const transactions = await db.Transaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(new Date() - miliseconds + week_in_ms),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+            user_id: user_id,
+        },
+    });
+
+    let spendings = 0;
+    for (let i = 0; i < transactions.length; i++) {
+        spendings += transactions[i]["amount"];
+    }
+
+    return spendings;
+}
+
+async function spendingsBy2Weeks(weeks_ago, user_id) {
+    const week_in_ms = 7 * 24 * 60 * 60 * 1000;
+    const miliseconds = week_in_ms * weeks_ago; // how many miliseconds fit in this period
+
+    const transactions = await db.Transaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(new Date() - miliseconds + 2 * week_in_ms),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+            user_id: user_id,
+        },
+    });
+
+    let spendings = 0;
+    for (let i = 0; i < transactions.length; i++) {
+        spendings += transactions[i]["amount"];
+    }
+
+    return spendings;
+}
+
+async function spendingsByMonth(months_ago, user_id) {
+    const month_in_ms = 30 * 24 * 60 * 60 * 1000;
+    const miliseconds = month_in_ms * months_ago; // how many miliseconds fit in this period
+
+    const transactions = await db.Transaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(new Date() - miliseconds + month_in_ms),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+            user_id: user_id,
+        },
+    });
+
+    let spendings = 0;
+    for (let i = 0; i < transactions.length; i++) {
+        spendings += transactions[i]["amount"];
+    }
+
+    return spendings;
+}
+
 module.exports = {
     transactionsByPeriod: transactionsByPeriod,
     categoriesAmounts: categoriesAmounts,
     top6Categories: top6Categories,
+    spendingsByPeriod: spendingsByPeriod,
 };

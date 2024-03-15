@@ -188,25 +188,28 @@ app.get("/check-api", (req, res) => {
         });
 });
 
-app.get("/all-transactions", async (req, res) => {
+app.get("/all-transactions", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
-    const transactions = await functions.transactionsByPeriod(period);
+    const user_id = req.user["id"];
+    const transactions = await functions.transactionsByPeriod(period, user_id);
 
     res.json(transactions);
 });
 
-app.get("/categories-amounts", async (req, res) => {
+app.get("/categories-amounts", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
-    const transactions = await functions.transactionsByPeriod(period);
+    const user_id = req.user["id"];
+    const transactions = await functions.transactionsByPeriod(period, user_id);
 
     let result = functions.categoriesAmounts(transactions);
 
     res.json(result);
 });
 
-app.post("/bar-chart", async (req, res) => {
+app.post("/bar-chart", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
-    const transactions = await functions.transactionsByPeriod(period);
+    const user_id = req.user["id"];
+    const transactions = await functions.transactionsByPeriod(period, user_id);
     const amounts = functions.categoriesAmounts(transactions);
 
     let top6categories = functions.top6Categories(amounts);
@@ -214,12 +217,21 @@ app.post("/bar-chart", async (req, res) => {
     res.json(top6categories);
 });
 
-app.post("/pie-chart", async (req, res) => { //! same as /transactions-by-category
+app.post("/pie-chart", authenticate, async (req, res) => { //! same as /categories-amounts
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
-    const transactions = await functions.transactionsByPeriod(period);
+    const user_id = req.user["id"];
+    const transactions = await functions.transactionsByPeriod(period, user_id);
     const amounts = functions.categoriesAmounts(transactions);
 
     res.json(amounts);
+});
+
+app.post("/line-chart", authenticate, async (req, res) => {
+    const period = req.body.period; // day | month | 3 months | 6 months | year | all
+    const user_id = req.user["id"];
+    const transactions = await functions.spendingsByPeriod(period, user_id);
+
+    res.json(transactions);
 });
 
 app.post("/scan-detected-qr", authenticate, (req, res) => {
