@@ -151,7 +151,7 @@ app.post("/scan-qr", authenticate, async (req, res) => {
         const base64Data = buf.toString("base64");
         const json = { data: base64Data };
 
-        url = "http://188.244.45.227:3214/check_bill";
+        url = `http://${process.env.API_IP}:3214/check_bill`;
 
         const formData = new FormData();
         formData.append("base64_data", json.data);
@@ -179,7 +179,7 @@ app.post("/scan-qr", authenticate, async (req, res) => {
 
 app.get("/check-api", (req, res) => {
     axios
-        .get("http://188.244.45.227:3214/?name=a")
+        .get(`http://${process.env.API_IP}:3214/?name=a`)
         .then((response) => {
             res.json(response.data);
         })
@@ -220,6 +220,24 @@ app.post("/pie-chart", async (req, res) => { //! same as /transactions-by-catego
     const amounts = functions.categoriesAmounts(transactions);
 
     res.json(amounts);
+});
+
+app.post("/scan-detected-qr", authenticate, (req, res) => {
+    axios
+        .get(`http://${process.env.API_IP}:3214/get_qr_info`, {
+            params: {
+                user_id: req.user["id"],
+                qr_data: req.body.data,
+                auto_sort: true,
+            }
+          })
+        .then((response) => {
+            res.json(response.data);
+        })
+        .catch((error) => {
+            console.error(error.response.data.detail);
+            res.status(500).json("smth went wrong");
+        });
 });
 
 db.sequelize.sync().then((req) => {
