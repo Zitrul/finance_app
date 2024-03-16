@@ -1,18 +1,9 @@
-import base64
-from io import BytesIO
-from PIL import Image
+Desktop Entry]
 
-# Получаем base64 строку из вашего кода Node.js
-base64_data = ""
+Type=Application
 
-# Декодируем base64 строку в байты
-bytes_data = base64.b64decode(base64_data)
+Name=VNCServer
 
-# Создаем объект BytesIO из байтов
-image_bytes = BytesIO(bytes_data)
+Exec=vncserver :1
 
-# Читаем изображение из BytesIO
-image = Image.open(image_bytes)
-
-# Сохраняем изображение
-image.save("output_image.png")
+StartupNotify=false
