@@ -258,6 +258,13 @@ app.post("/scan-detected-qr", authenticate, (req, res) => {
         });
 });
 
+app.get("/all-news", authenticate, async (req, res) => {
+    const user_id = req.user["id"];
+    const news = await db.LatestNews.findAll();
+
+    res.json(news);
+});
+
 db.sequelize.sync().then((req) => {
     process.env.db = db;
     app.listen(port, () => {
