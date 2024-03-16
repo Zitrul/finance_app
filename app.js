@@ -131,14 +131,19 @@ app.post("/add-transaction", authenticate, async (req, res) => {
         const amount = parseFloat(req.body.amount);
         const category = req.body.category;
         const currency = req.body.currency;
-        const transaction = await db.Transaction.create({
-            user_id: user_id,
-            name: name,
-            amount: amount,
-            category: category,
-            currency: currency,
-        });
-        res.status(200).json("succeeded");
+        if(amount >= 0.01){
+            await db.Transaction.create({
+                user_id: user_id,
+                name: name,
+                amount: amount,
+                category: category,
+                currency: currency,
+            });
+            res.status(200).json("succeeded");
+        }
+        else{
+            res.status(400).json("Указана неверная сумма");
+        }
     } catch (err) {
         console.log(err);
         res.status(500).json("smth went wrong");

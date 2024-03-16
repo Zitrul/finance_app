@@ -1,34 +1,31 @@
 module.exports = (sequelize, DataTypes) => {
-    const Transaction = sequelize.define('Transaction', {
+    const LatestNews = sequelize.define('LatestNews', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        user_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true
-        },
-        name: {
+        company_name: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
         },
-        amount: {
-            type: DataTypes.FLOAT,
-            allowNull: true
-        },
-        category: {
+        link: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
         },
-        currency: {
+        description: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
+        },
+        send_in_telegram: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
         },
         created_at: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
-            allowNull: true
+            allowNull: false
         }
     }, {
         freezeTableName: true,
@@ -36,5 +33,5 @@ module.exports = (sequelize, DataTypes) => {
     });
 
 
-    return Transaction;
+    return LatestNews;
 }

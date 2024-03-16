@@ -38,7 +38,8 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true
         },
         created_at: {
-            type: DataTypes.NOW,
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
             allowNull: true
         }
     }, {
