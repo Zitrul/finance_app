@@ -82,7 +82,6 @@
                                     v-for="val in current_transactions_list"
                                     :key="val.id"
                                     :subtitle="val.category"
-                                    :value="val.id"
                                     class="pa-2"
                                 >
                                     <div class="d-flex flex-row justify-space-between">
@@ -131,7 +130,7 @@ import * as fun from "@/functions.js";
 import Chart from 'chart.js/auto'
 
 export default {
-  name: "Main",
+  name: "Wallet",
   components: {
     Sign,
     UsualBar,

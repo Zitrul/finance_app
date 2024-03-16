@@ -38,9 +38,10 @@
         <v-divider v-if="smAndDown"></v-divider>
 
         <v-list nav>
-            <v-list-item prepend-icon="mdi-wallet" :class="{'text-primary': current_route == '/wallet'}" title="Мои Финансы" value="wallet"></v-list-item>
+            <v-list-item prepend-icon="mdi-wallet" :class="{'text-primary': current_route == '/wallet'}" title="Мои Финансы" value="wallet" to="/wallet"></v-list-item>
             <v-list-item prepend-icon="mdi-briefcase-variant" title="Инвестиции" value="investments"></v-list-item>
             <v-list-item prepend-icon="mdi-poll" title="Аналитика" value="analytics"></v-list-item>
+            <v-list-item prepend-icon="mdi-newspaper" :class="{'text-primary': current_route == '/news'}" title="Новости" value="news"to="/news"></v-list-item>
         </v-list>
 
         <v-spacer></v-spacer>
