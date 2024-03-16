@@ -1,23 +1,23 @@
 {
   "development": {
-    "username": "root",
-    "password": "",
-    "database": "mm",
-    "host": "127.0.0.1",
+    "username": "sigma",
+    "password": "j$sdjk!53",
+    "database": "main_db",
+    "host": "46.188.100.158",
     "dialect": "mysql"
   },
   "test": {
-    "username": "root",
-    "password": "",
-    "database": "mm",
-    "host": "127.0.0.1",
+    "username": "sigma",
+    "password": "j$sdjk!53",
+    "database": "main_db",
+    "host": "46.188.100.158",
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": "",
-    "database": "mm",
-    "host": "127.0.0.1",
+    "username": "sigma",
+    "password": "j$sdjk!53",
+    "database": "main_db",
+    "host": "46.188.100.158",
     "dialect": "mysql"
   }
 }
