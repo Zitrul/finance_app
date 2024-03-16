@@ -29,7 +29,7 @@
                                         class="pa-2"
                                     >
                                         <div class="d-flex flex-row justify-space-between">
-                                            <p class="font-weight-medium link">{{ val.description }}</p>
+                                            <p class="font-weight-medium link">{{ val.description.split(' - ').length == 2 ? val.description.split(' - ')[1] : val.description }}</p>
                                             <p>{{ fun.format_current_date(val.created_at) }}</p>
                                         </div>
                                     </v-list-item>
