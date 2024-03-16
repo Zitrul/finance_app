@@ -17,7 +17,7 @@
             </v-row>
             
             <v-spacer></v-spacer>
-            <v-btn color="primary">
+            <v-btn color="primary" @click="emit_sign_click()">
                 <font-awesome-icon :icon="['fas', 'arrow-right-to-bracket']"/>
                 <p class="text-h6 ml-2 white--text">Войти в аккаунт</p>
             </v-btn>
@@ -45,6 +45,11 @@ import * as fun from '@/functions.js'
 
 export default {
     name: 'LandingBar',
+    methods: {
+        emit_sign_click() {
+            this.$emit('sign_clicked');
+        }
+    }
 }
 </script>
 

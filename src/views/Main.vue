@@ -1,8 +1,11 @@
 <template>
     <v-app @scroll="handleScroll()" class="background_line">
 
-    <LandingBar></LandingBar>
-    
+    <LandingBar @sign_clicked="sign_form_opened = !sign_form_opened"></LandingBar>
+    <v-overlay v-model="sign_form_opened" class="align-center justify-center">
+      <Sign @closed="sign_form_opened = false"></Sign>
+    </v-overlay>
+
 
         <v-container fluid :class="{'h-screen': mdAndUp, 'my-1': true}">
             <v-row wrap>
@@ -13,7 +16,7 @@
                   'text-h3': lgAndDown,
                   'text-right': mdAndUp,
                   'text-center': smAndDown,
-                'text_title_color': true,  'font-weight-medium': true, 'ls-1': true, 'mb-16': true}">Money Minder</p>
+                  'text_title_color': true, 'font-weight-medium': true, 'ls-1': true, 'mb-16': true}">Money Minder</p>
 
                 <v-row>
                   <v-spacer v-if="mdAndUp"></v-spacer>
@@ -97,7 +100,7 @@
         </v-container>
     </v-app>
     <div class="absolute_forms">
-        <!-- <Sign></Sign> -->
+        
     </div>
 </template>
 
@@ -121,10 +124,15 @@ export default {
   },
   data() {
     return {
-
+      sign_form_opened: false,
     };
   },
   mounted() {
+    fun.check_auth(this).then(response => {
+      if(response){
+        this.$router.push('/wallet')
+      }
+    })
   },
   methods: {
     handleScroll() {
@@ -160,5 +168,8 @@ export default {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+}
+.absolute_forms{
+  position: fixed;
 }
 </style>

@@ -6,21 +6,25 @@ import router from './router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueCookies from 'vue-cookies';
+import VueQrcodeReader from 'vue3-qrcode-reader'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
+import './assets/tailwind.css'
 
 library.add(fas);
 loadFonts()
 /* eslint-disable */
 
 const app = createApp(App)
-app.config.globalProperties.axios = axios;
 app.use(VueCookies);
+
+axios.defaults.headers['authorization'] = `Bearer ${app.$cookies.get('accessToken')}`;
+axios.defaults.withCredentials = true;
+app.config.globalProperties.axios = axios;
 
 app.use(router)
   .use(vuetify)
+  .use(VueQrcodeReader)
   .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');
-
-// axios.defaults.headers['admin_pass'] = `${app.$cookies.get('pass')}`;
