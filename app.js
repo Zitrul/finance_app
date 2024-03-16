@@ -189,7 +189,7 @@ app.get("/check-api", (req, res) => {
         });
 });
 
-app.get("/all-transactions", authenticate, async (req, res) => {
+app.post("/all-transactions", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
     const transactions = await functions.transactionsByPeriod(period, user_id);
@@ -197,7 +197,7 @@ app.get("/all-transactions", authenticate, async (req, res) => {
     res.json(transactions);
 });
 
-app.get("/categories-amounts", authenticate, async (req, res) => {
+app.post("/categories-amounts", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
     const transactions = await functions.transactionsByPeriod(period, user_id);

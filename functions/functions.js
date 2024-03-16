@@ -53,7 +53,7 @@ function categoriesAmounts(transactions) {
 
 function rearrangeObject(obj) {
     const keys = Object.keys(obj);
-    let mid = Math.ceil(keys.length / 2);
+    let mid = Math.floor(keys.length / 2);
     if (keys.length % 2 == 0) mid += 1;
 
     let newObj = {};
@@ -87,7 +87,8 @@ function top6Categories(amounts) {
             return result;
         }, {});
 
-    return rearrangeObject(top6);
+    // return rearrangeObject(top6);
+    return top6;
 }
 
 async function spendingsByPeriod(period, user_id) {
