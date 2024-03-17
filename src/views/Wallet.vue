@@ -1,6 +1,5 @@
 <template>
     <v-app>
-        <UsualBar>Управление финансами</UsualBar>
 
         <v-main>
             <v-container fluid :class="{'ml-16': lgAndUp, 'pl-8': lgAndUp, 'pl-6': lgAndDown, 'd-flex': true, 'justify-center': true}">
@@ -82,6 +81,7 @@
                                     v-for="val in current_transactions_list"
                                     :key="val.id"
                                     :subtitle="val.category"
+                                    href="#"
                                     class="pa-2"
                                 >
                                     <div class="d-flex flex-row justify-space-between">

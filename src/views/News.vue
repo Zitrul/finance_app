@@ -1,6 +1,5 @@
 <template>
     <v-app>
-        <UsualBar>Последние новости</UsualBar>
 
         <v-main>
             <v-container fluid :class="{'ml-16': lgAndUp, 'pl-8': lgAndUp, 'pl-6': lgAndDown, 'd-flex': true, 'justify-center': true}">
@@ -30,7 +29,7 @@
                                     >
                                         <div class="d-flex flex-row justify-space-between">
                                             <p class="font-weight-medium link">{{ val.description.split(' - ').length == 2 ? val.description.split(' - ')[1] : val.description }}</p>
-                                            <p>{{ fun.format_current_date(val.created_at) }}</p>
+                                            <p>{{ /*fun.format_current_date(val.created_at)*/val.created_at }}</p>
                                         </div>
                                     </v-list-item>
                                 </v-list>
@@ -39,7 +38,7 @@
                                     v-model="news_page"
                                     fluid
                                     :length="Math.floor(news.length / news_pro_page) + (news.length % news_pro_page == 0 ? 0 : 1)"
-                                    :total-visible="7"
+                                    :total-visible="5"
                                     ></v-pagination>
                                 </div>
                             </v-col>

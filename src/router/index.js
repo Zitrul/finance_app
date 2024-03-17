@@ -11,12 +11,12 @@ const routes = [
   },
   {
     path: '/wallet',
-    name: 'Финансы',
+    name: 'Управление финансами',
     component: Wallet
   },
   {
     path: '/news',
-    name: 'Новости',
+    name: 'Последние новости',
     component: News
   },
 ]
