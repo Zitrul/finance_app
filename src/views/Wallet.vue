@@ -1,116 +1,111 @@
 <template>
-    <v-app>
+    <ContentWrapper>
+        <v-row>
+            <v-col cols="1" v-if="lgAndUp">
+            </v-col>
 
-        <v-main>
-            <v-container fluid :class="{'ml-16': lgAndUp, 'pl-8': lgAndUp, 'pl-6': lgAndDown, 'd-flex': true, 'justify-center': true}">
+            <v-col :cols="smAndDown ? 12 : 7">
                 <v-row>
-                    <v-col cols="1" v-if="lgAndUp">
-                    </v-col>
-
-                    <v-col :cols="smAndDown ? 12 : 7">
+                    <v-col cols="12">
                         <v-row>
-                            <v-col cols="12">
-                                <v-row>
-                                    <p class="text-h4 text-text_title">Внести расходы</p>
-                                </v-row>
-                                <v-row fluid>
-                                    <v-btn size="x-large" class="ma-3 ml-0" @click="scanner_opened = true">
-                                        <v-icon icon="mdi-qrcode-scan"></v-icon>
-                                        <p class="ml-2">По фото чека</p>
-                                    </v-btn>
-                                    <v-btn size="x-large" :class="{'ma-3' : smAndUp}" @click="transactin_form_opened = true">
-                                        <v-icon icon="mdi-file-edit-outline"></v-icon>
-                                        <p class="ml-2">Внести вручную</p>
-                                    </v-btn>
-                                </v-row>
-                            </v-col>
-                            <v-col>
-                                
-                            </v-col>
+                            <p class="text-h4 text-text_title">Внести расходы</p>
                         </v-row>
-                        <div class="mt-3">
-                            <v-row>
-                                <p class="text-h4 text-text_title">Ваши траты</p>
-                            </v-row>
-                            <v-row>
-                                <v-col>
-                                    <div class="mt-3"></div>
-                                    <v-row>
-                                        <v-menu v-model="menuOpen">
-                                            <template v-slot:activator="{ props }">
-                                                <v-btn
-                                                color="primary"
-                                                v-bind="props"
-                                                >
-                                                {{ periods[period_selected].title }} <font-awesome-icon :icon="['fas', menuOpen ? 'angle-up' : 'angle-down']" class="ml-2"/>
-                                                </v-btn>
-                                            </template>
-                                            <v-list>
-                                                <v-list-item
-                                                v-for="(item, index) in periods"
-                                                :key="index"
-                                                :value="index"
-                                                @click="change_period(index)"
-                                                >
-                                                <v-list-item-title>{{ item.title }}</v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
-                                        </v-menu>
-                                        
-                                        <div class="d-flex flex-row ma-0 ml-5">
-                                            <v-btn variant="plain" @click="change_chart('line')" title="Линейный график"><font-awesome-icon :icon="['fas', 'chart-line']"/></v-btn>
-                                            <v-btn variant="plain" @click="change_chart('pie')" title="График-пирог"><font-awesome-icon :icon="['fas', 'chart-pie']" /></v-btn>
-                                            <v-btn variant="plain" @click="change_chart('bar')" title="Столбцовый график"><font-awesome-icon :icon="['fas', 'chart-simple']" /></v-btn>
-                                        </div>
-                                    </v-row>
-                                    <v-row>
-                                        <div class="chart_container mt-7">
-                                            <canvas id="chart"></canvas>
-                                        </div>
-                                    </v-row>
-                                </v-col>
-                            </v-row>
-                        </div>
+                        <v-row fluid>
+                            <v-btn size="x-large" class="ma-3 ml-0" @click="scanner_opened = true">
+                                <v-icon icon="mdi-qrcode-scan"></v-icon>
+                                <p class="ml-2">По фото чека</p>
+                            </v-btn>
+                            <v-btn size="x-large" :class="{'ma-3' : smAndUp}" @click="transactin_form_opened = true">
+                                <v-icon icon="mdi-file-edit-outline"></v-icon>
+                                <p class="ml-2">Внести вручную</p>
+                            </v-btn>
+                        </v-row>
                     </v-col>
-
-                    <v-col :cols="smAndDown ? 12 : (lgAndUp ? 3 : 5)">
-                        <v-card>
-                            <p class="text-h4 text-text_title">Список транзакций</p>
-                            <v-list>
-                                <v-list-item
-                                    v-for="val in current_transactions_list"
-                                    :key="val.id"
-                                    :subtitle="val.category"
-                                    href="#"
-                                    class="pa-2"
-                                >
-                                    <div class="d-flex flex-row justify-space-between">
-                                        <p class="text-primary font-weight-medium">{{ val.amount }} ₽</p>
-                                        <p class="font-weight-medium">{{ val.name }}</p>
-                                        <p>{{ fun.format_current_date(val.created_at) }}</p>
-                                    </div>
-                                </v-list-item>
-                            </v-list>
-                            <div class="text-center">
-                                <v-pagination
-                                v-model="transaction_page"
-                                fluid
-                                :length="Math.floor(transactions.length / transactions_pro_page) + (transactions.length % transactions_pro_page == 0 ? 0 : 1)"
-                                ></v-pagination>
-                            </div>
-                        </v-card>
+                    <v-col>
+                        
                     </v-col>
                 </v-row>
-            </v-container>
-        </v-main>
-        
+                <div class="mt-3">
+                    <v-row>
+                        <p class="text-h4 text-text_title">Ваши траты</p>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <div class="mt-3"></div>
+                            <v-row>
+                                <v-menu v-model="menuOpen">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        color="primary"
+                                        v-bind="props"
+                                        >
+                                        {{ periods[period_selected].title }} <font-awesome-icon :icon="['fas', menuOpen ? 'angle-up' : 'angle-down']" class="ml-2"/>
+                                        </v-btn>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item
+                                        v-for="(item, index) in periods"
+                                        :key="index"
+                                        :value="index"
+                                        @click="change_period(index)"
+                                        >
+                                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                                
+                                <div class="d-flex flex-row ma-0 ml-5">
+                                    <v-btn variant="plain" @click="change_chart('line')" title="Линейный график"><font-awesome-icon :icon="['fas', 'chart-line']"/></v-btn>
+                                    <v-btn variant="plain" @click="change_chart('pie')" title="График-пирог"><font-awesome-icon :icon="['fas', 'chart-pie']" /></v-btn>
+                                    <v-btn variant="plain" @click="change_chart('bar')" title="Столбцовый график"><font-awesome-icon :icon="['fas', 'chart-simple']" /></v-btn>
+                                </div>
+                            </v-row>
+                            <v-row>
+                                <div class="chart_container mt-7">
+                                    <canvas id="chart"></canvas>
+                                </div>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                </div>
+            </v-col>
+
+            <v-col :cols="smAndDown ? 12 : (lgAndUp ? 3 : 5)">
+                <v-card>
+                    <p class="text-h4 text-text_title">Список транзакций</p>
+                    <v-list>
+                        <v-list-item
+                            v-for="val in current_transactions_list"
+                            :key="val.id"
+                            :subtitle="val.category"
+                            href="#"
+                            class="pa-2"
+                        >
+                            <div class="d-flex flex-row justify-space-between">
+                                <p class="text-primary font-weight-medium">{{ val.amount }} ₽</p>
+                                <p class="font-weight-medium">{{ val.name }}</p>
+                                <p>{{ fun.format_current_date(val.created_at) }}</p>
+                            </div>
+                        </v-list-item>
+                    </v-list>
+                    <div class="text-center">
+                        <v-pagination
+                        v-model="transaction_page"
+                        fluid
+                        :length="Math.floor(transactions.length / transactions_pro_page) + (transactions.length % transactions_pro_page == 0 ? 0 : 1)"
+                        ></v-pagination>
+                    </div>
+                </v-card>
+            </v-col>
+        </v-row>
+
         <v-overlay v-model="scanner_opened" class="align-center justify-center">
             <QrScanner @closed="scanner_opened = false; change_period(period_selected);"></QrScanner>
         </v-overlay>
         <v-overlay v-model="transactin_form_opened" class="align-center justify-center ">
             <TransactionForm @closed="transactin_form_opened = false; change_period(period_selected);"></TransactionForm>
         </v-overlay>
-    </v-app>
+    </ContentWrapper>
 </template>
 
 <script setup>
@@ -125,6 +120,7 @@ import Sign from "@/components/Sign.vue";
 import UsualBar from '@/components/UsualBar.vue'
 import QrScanner from '@/components/QrScanner.vue'
 import TransactionForm from '@/components/TransactionForm.vue'
+import ContentWrapper from '@/components/ContentWrapper.vue'
 import * as fun from "@/functions.js";
 
 import Chart from 'chart.js/auto'
@@ -136,6 +132,7 @@ export default {
     UsualBar,
     QrScanner,
     TransactionForm,
+    ContentWrapper
   },
   data() {
     return {
@@ -389,11 +386,11 @@ export default {
                         {
                             type: 'line',
                             data: {
-                                labels: Object.keys(data),
+                                labels: Object.keys(data).reverse(),
                                 datasets: [
                                     {
                                         // label: 'Денег потрачено',
-                                        data: Object.values(data),
+                                        data: Object.values(data).reverse(),
                                         fill: true,
                                         borderColor: 'rgb(238, 112, 84)',
                                         tension: 0.1
