@@ -23,6 +23,8 @@
     "mysql2": "^3.9.1",
     "nodemon": "^3.0.3",
     "path": "^0.12.7",
-    "sequelize": "^6.37.0"
+    "request": "^2.88.2",
+    "sequelize": "^6.37.0",
+    "yahoo-finance2": "^2.10.0"
   }
 }

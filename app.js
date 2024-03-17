@@ -16,6 +16,8 @@ const cors = require("cors");
 const axios = require("axios");
 const upload = require("express-fileupload");
 const { periodToMiliseconds } = require("./functions/functions.js");
+const yahooFinance = require("yahoo-finance2").default; // NOTE the .default
+
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
 // const fun = require("./functions");
 
@@ -23,7 +25,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // app.use(cors());
-app.use(function (req, res, next){
+app.use(function (req, res, next) {
     // Enabling CORS
     res.header("Access-Control-Allow-Origin", "http://localhost:8080");
     res.header(
@@ -131,7 +133,7 @@ app.post("/add-transaction", authenticate, async (req, res) => {
         const amount = parseFloat(req.body.amount);
         const category = req.body.category;
         const currency = req.body.currency;
-        if(amount >= 0.01){
+        if (amount >= 0.01) {
             await db.Transaction.create({
                 user_id: user_id,
                 name: name,
@@ -140,8 +142,7 @@ app.post("/add-transaction", authenticate, async (req, res) => {
                 currency: currency,
             });
             res.status(200).json("succeeded");
-        }
-        else{
+        } else {
             res.status(400).json("Указана неверная сумма");
         }
     } catch (err) {
@@ -223,7 +224,8 @@ app.post("/bar-chart", authenticate, async (req, res) => {
     res.json(top6categories);
 });
 
-app.post("/pie-chart", authenticate, async (req, res) => { //! same as /categories-amounts
+app.post("/pie-chart", authenticate, async (req, res) => {
+    //! same as /categories-amounts
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
     const transactions = await functions.transactionsByPeriod(period, user_id);
@@ -247,8 +249,8 @@ app.post("/scan-detected-qr", authenticate, (req, res) => {
                 user_id: req.user["id"],
                 qr_data: req.body.data,
                 auto_sort: true,
-            }
-          })
+            },
+        })
         .then((response) => {
             res.json(response.data);
         })
@@ -263,6 +265,57 @@ app.get("/all-news", authenticate, async (req, res) => {
     const news = await db.LatestNews.findAll();
 
     res.json(news);
+});
+
+app.post("/add-stocks", authenticate, async (req, res) => {
+    try {
+        const ticker = req.body.ticker;
+        const amount = req.body.amount;
+        const user_id = req.user["id"];
+        const news_sub = req.body.news_sub;
+
+        const stockFound = await db.UserAssets.findOne({
+            where: sequelize.and({ user_id: user_id }, { stock_quote: ticker }),
+        });
+
+        if (stockFound) {
+            stockFound.asset_amount += amount;
+            stockFound.save();
+        } else {
+            const stock_info = await yahooFinance.quote(ticker);
+            const company_name = stock_info["shortName"];
+
+            await db.UserAssets.create({
+                user_id: user_id,
+                company_name: company_name,
+                asset_amount: amount,
+                news_subscription: news_sub,
+                stock_quote: ticker,
+            });
+        }
+
+        res.status(200).json("succeeded");
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
+});
+
+app.get("/users-stocks", authenticate, async (req, res) => {
+    try {
+        const user_id = req.user["id"];
+
+        const stocks = await db.UserAssets.findAll({
+            where: {
+                user_id: user_id,
+            },
+        });
+
+        res.status(200).json(stocks);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
 });
 
 db.sequelize.sync().then((req) => {
