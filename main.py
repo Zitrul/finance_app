@@ -36,7 +36,7 @@ def read_main(name: str):
     return {"Hello": "World"}
 
 
-@app.get("/add_product_user")
+@app.post("/add_product_user")
 def add_product(user_id: str, name: str, amount: str, category: str, currency: str, select_category: str):
     product = [Product(name, amount, currency, category)]
     if select_category == "True":
@@ -51,7 +51,7 @@ def add_product(user_id: str, name: str, amount: str, category: str, currency: s
     return {"OK": "OK"}
 
 
-@app.get("/add_user_assets")
+@app.post("/add_user_assets")
 def add_user_assets(user_id: str, company_name: str, asset_amount: str, news_subscription: str, stock_quote: str):
     db = DBmanager()
     db.add_users_asset(company_name, news_subscription, user_id, asset_amount, stock_quote)
