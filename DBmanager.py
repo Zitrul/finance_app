@@ -6,7 +6,7 @@ import pymysql.cursors
 class DBmanager:
     def __init__(self):
 
-        self.conn = pymysql.connect(host="188.244.45.227",
+        self.conn = pymysql.connect(host="46.188.100.158",
                                     port=3306,
                                     user="sigma",
                                     password="j$sdjk!53",
@@ -57,8 +57,14 @@ class DBmanager:
         return companies
 
     def add_users_asset(self, company_name,news_subscription, user_id, asset_amount,stock_quote):
-        sql = "INSERT INTO UserAssets (company_name, news_subscription, user_id, asset_amount, created_at, stock_quote ) VALUES (%s, %s, %s, %s, %s, %s);"
-        self.cur.execute(sql, (company_name, news_subscription, user_id, asset_amount, datetime.datetime().strftime("%Y-%m-%d_%H-%M-%S")), stock_quote)
+        if news_subscription == "true":
+            news_subscription = 1
+        elif news_subscription == "True":
+            news_subscription = 1
+        else:
+            news_subscription = 0
+        sql = "INSERT INTO UserAssets (company_name, news_subscription, user_id, asset_amount, created_at, stock_quote,  updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s);"
+        self.cur.execute(sql, (company_name, news_subscription, user_id, asset_amount, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"), stock_quote, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
         companies = self.cur.fetchall()
         return companies
     def commit(self):
