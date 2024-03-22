@@ -8,7 +8,8 @@ from threading import Thread
 from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
-from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_sort
+from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_sort, auto_sort_vector, \
+    get_current_price
 from classes import stringa, Product
 
 
@@ -40,7 +41,7 @@ def read_main(name: str):
 def add_product(user_id: str, name: str, amount: str, category: str, currency: str, select_category: str):
     product = [Product(name, amount, currency, category)]
     if select_category == "True":
-        product = auto_sort(product)
+        product = auto_sort_vector(product)
     else:
         if product[0].category == "":
             product[0].category = "Остальное"
@@ -141,11 +142,17 @@ async def create_upload_file(uploaded_file: UploadFile = File(), user_id: str = 
 
 
 @app.get("/get_history")
-async def get_history_method(ticker: str, date_from: str):
-    current_date = datetime.now().strftime('%Y-%m-%d')
+def get_history_method(ticker: str, date_from: str):
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
     result = get_history(ticket= ticker, date_end=current_date, date_start=date_from)
     return result
 
+
+@app.get("/get_current_price")
+def get_current_price_method(ticker: str):
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+    result = get_current_price(ticket= ticker, date_get=current_date)
+    return result
 
 if __name__ == "__main__":
 
