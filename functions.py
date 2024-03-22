@@ -1,7 +1,8 @@
 import os
 import sqlite3
 from datetime import datetime, timedelta
-
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import requests
 from pyzbar import pyzbar
 import cv2
@@ -16,6 +17,13 @@ categories = ['Мясная гастрономия', 'Сладости и дес
               'Товары для дома', 'Авто', 'Канцтовары', 'Красота и здоровье', 'Досуг и хобби', 'Игрушки', 'Мебель',
               'Детская одежда и обувь', 'Хозтовары', 'Зоотовары', 'Детям и мамам', 'Книги', 'Дача и сад']
 
+def vector_compare(sentence1,sentences):
+    vectorizer = TfidfVectorizer()
+    vector = vectorizer.fit_transform([sentence1]+list(sentences))
+    vectors = vector.toarray()
+    simular = cosine_similarity(vectors)
+    print(max(simular[0][1:])*100, sentences[simular[0].argmax()])
+    return max(simular[0][1:])*100
 
 def compare(s1, s2):
     words1 = s1.lower().split()
@@ -34,6 +42,43 @@ def compare(s1, s2):
     a = min(count / (max(len(list1), 1)), 1) * 100 * min(count / max(len(list2), 1), 1)
     return a
 
+
+
+def auto_sort_vector(products_to_check):
+    conn = sqlite3.connect('products.db')
+    cursor = conn.cursor()
+    product_like = []
+    found_flag = 0
+    n = len(products_to_check)
+    result = []
+
+    for i in range(n):
+        result.append(0)
+        product_like.append(0)
+
+    for category in categories:
+        cursor.execute(f'SELECT product FROM Product_to_compare WHERE type = ?;', [category])
+        rows = cursor.fetchall()
+        all_rows = []
+        for row in rows:
+            if row[0] != "0":
+                all_rows.append(row[0])
+        for i in range(n):
+            check = vector_compare(products_to_check[i].name, all_rows)
+            if check > result[i] and check > 65:
+                result[i] = check
+
+                products_to_check[i].category = category
+
+        #if found_flag != 0:
+        #    break
+
+    print(result)
+    print(products_to_check[0].category, product_like)
+    conn.commit()
+    conn.close()
+
+    return products_to_check
 
 def auto_sort(products_to_check):
     conn = sqlite3.connect('products.db')
@@ -115,40 +160,6 @@ def CHECK_CHECKER(auto_change, user_id, file_location):
     # print(check_data["data"]["json"]["items"])
 
 
-def auto_sort(products_to_check):
-    conn = sqlite3.connect('products.db')
-    cursor = conn.cursor()
-    product_like = []
-    found_flag = 0
-    n = len(products_to_check)
-    result = []
-
-    for i in range(n):
-        result.append(0)
-        product_like.append(0)
-
-    for category in categories:
-        cursor.execute(f'SELECT product FROM Product_to_compare WHERE type = ?;', [category])
-        rows = cursor.fetchall()
-
-        for row in rows:
-
-            for i in range(n):
-                check = compare(products_to_check[i].name, row[0])
-                if check > result[i] and check > 60:
-                    result[i] = check
-                    product_like[i] = row[0]
-                    products_to_check[i].category = category
-
-        if found_flag != 0:
-            break
-    print(result)
-    print(product_like)
-    conn.commit()
-    conn.close()
-
-    return products_to_check
-
 
 def add_by_qr_info(auto_change, user_id, qr_data):
     url = "https://proverkacheka.com/api/v1/check/get"
@@ -197,3 +208,20 @@ def get_history(ticket, date_start, date_end):
         if f == 0:
             break
     return result
+def get_current_price(ticket, date_get):
+    result = dict()
+    url = f'https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/{ticket}/securities.json?from={date_get}'
+    info = requests.get(url).json()
+    data = info["history"]["data"]
+    print(data)
+    for inform in data:
+        date1 = datetime.strptime(inform[1], "%Y-%m-%d")
+        if date1 <= datetime.strptime(date_get, "%Y-%m-%d"):
+            result["price"] = inform[6]
+
+    if result == {}:
+        new_date = datetime.strptime(date_get, "%Y-%m-%d") - timedelta(days=1)
+        return get_current_price(ticket, new_date.strftime('%Y-%m-%d'))
+    else:
+        print(result)
+        return result
