@@ -151,9 +151,9 @@ app.post("/add-transaction", authenticate, async (req, res) => {
     }
 });
 
-app.put("/change-transaction", async (req, res) => {
+app.post("/change-transaction", async (req, res) => {
     try {
-        const id = req.body.id;
+        const id = req.query.id;
 
         const transaction = await db.Transaction.findOne({
             where: { id: id },
@@ -164,7 +164,7 @@ app.put("/change-transaction", async (req, res) => {
         transaction.category = req.body.category;
         transaction.currency = req.body.currency;
 
-        transaction.save();
+        await transaction.save();
 
         res.status(200).json("success");
     } catch (err) {
