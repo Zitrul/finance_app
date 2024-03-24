@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const auth = require("./functions/auth.js");
-const functions = require("./functions/functions.js");
+const charts = require("./functions/charts.js");
 const mid = require("./middlewares");
 const express = require("express");
 const fs = require("fs");
@@ -15,7 +15,7 @@ const sequelize = require("sequelize");
 const cors = require("cors");
 const axios = require("axios");
 const upload = require("express-fileupload");
-const { periodToMiliseconds } = require("./functions/functions.js");
+const { periodToMiliseconds } = require("./functions/charts.js");
 const yahooFinance = require("yahoo-finance2").default; // NOTE the .default
 
 // const adminAuthMiddleware = require("./middlewares/adminAuthMiddleware");
@@ -198,7 +198,7 @@ app.get("/check-api", (req, res) => {
 app.post("/all-transactions", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
-    const transactions = await functions.transactionsByPeriod(period, user_id);
+    const transactions = await charts.transactionsByPeriod(period, user_id);
 
     res.json(transactions);
 });
@@ -206,9 +206,9 @@ app.post("/all-transactions", authenticate, async (req, res) => {
 app.post("/categories-amounts", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
-    const transactions = await functions.transactionsByPeriod(period, user_id);
+    const transactions = await charts.transactionsByPeriod(period, user_id);
 
-    let result = functions.categoriesAmounts(transactions);
+    let result = charts.categoriesAmounts(transactions);
 
     res.json(result);
 });
@@ -216,10 +216,10 @@ app.post("/categories-amounts", authenticate, async (req, res) => {
 app.post("/bar-chart", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
-    const transactions = await functions.transactionsByPeriod(period, user_id);
-    const amounts = functions.categoriesAmounts(transactions);
+    const transactions = await charts.transactionsByPeriod(period, user_id);
+    const amounts = charts.categoriesAmounts(transactions);
 
-    let top6categories = functions.top6Categories(amounts);
+    let top6categories = charts.top6Categories(amounts);
 
     res.json(top6categories);
 });
@@ -228,8 +228,8 @@ app.post("/pie-chart", authenticate, async (req, res) => {
     //! same as /categories-amounts
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
-    const transactions = await functions.transactionsByPeriod(period, user_id);
-    const amounts = functions.categoriesAmounts(transactions);
+    const transactions = await charts.transactionsByPeriod(period, user_id);
+    const amounts = charts.categoriesAmounts(transactions);
 
     res.json(amounts);
 });
@@ -237,7 +237,7 @@ app.post("/pie-chart", authenticate, async (req, res) => {
 app.post("/line-chart", authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
-    const transactions = await functions.spendingsByPeriod(period, user_id);
+    const transactions = await charts.spendingsByPeriod(period, user_id);
 
     res.json(transactions);
 });
@@ -280,7 +280,7 @@ app.post("/add-stocks", authenticate, async (req, res) => {
 
         if (stockFound) {
             stockFound.asset_amount += amount;
-            stockFound.save();
+            await stockFound.save();
         } else {
             const stock_info = await yahooFinance.quote(ticker);
             const company_name = stock_info["shortName"];
