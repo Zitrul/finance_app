@@ -151,6 +151,29 @@ app.post("/add-transaction", authenticate, async (req, res) => {
     }
 });
 
+app.put("/change-transaction", async (req, res) => {
+    try {
+        const id = req.body.id;
+
+        const transaction = await db.Transaction.findOne({
+            where: { id: id },
+        });
+
+        transaction.name = req.body.name;
+        transaction.amount = req.body.amount;
+        transaction.category = req.body.category;
+        transaction.currency = req.body.currency;
+
+        transaction.save();
+
+        res.status(200).json("success");
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
+    
+});
+
 app.post("/scan-qr", authenticate, async (req, res) => {
     try {
         const image = req.files.img;
