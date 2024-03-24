@@ -151,12 +151,15 @@ app.post("/add-transaction", authenticate, async (req, res) => {
     }
 });
 
-app.post("/change-transaction", async (req, res) => {
+app.post("/change-transaction", authenticate, async (req, res) => {
     try {
         const id = req.query.id;
 
         const transaction = await db.Transaction.findOne({
-            where: { id: id },
+            where: { 
+                id: id,
+                user_id: req.user["id"],
+            },
         });
 
         transaction.name = req.body.name;
@@ -171,7 +174,6 @@ app.post("/change-transaction", async (req, res) => {
         console.log(err);
         res.status(500).json("smth went wrong");
     }
-    
 });
 
 app.post("/scan-qr", authenticate, async (req, res) => {
