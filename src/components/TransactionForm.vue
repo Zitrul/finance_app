@@ -1,7 +1,7 @@
 <template>
     <v-container class="d-flex flex-column align-center pa-10 bg-surface rounded-xl">
         <v-container class="d-flex flex-row align-center justify-space-between pa-0" fluid>
-            <p class="text-h5">Занесение трат</p>
+            <p class="text-h5">{{edit_mode ? 'Редактировать' : 'Занесение трат'}}</p>
             <font-awesome-icon :icon="['fas', 'xmark']" @click="close_form()" class="text-h4 cursor-pointer"/>
         </v-container>
         
@@ -51,7 +51,7 @@
             block
             @click="add()"
             >
-            Добавить
+            {{edit_mode ? 'Изменить' : 'Добавить'}}
             </v-btn>
         </v-form>
 
@@ -109,6 +109,28 @@ import { useDisplay } from 'vuetify'
 
 export default {
     name: 'TransactionForm',
+    props: {
+        edit_mode: {
+            type: Boolean,
+            default: false
+        },
+        Ename: {
+            type: String,
+            default: ''
+        },
+        Eprice: {
+            type: String,
+            default: '100.00'
+        },
+        Ecategory_selected: {
+            type: String,
+            default: 'Своя категория'
+        },
+        Eid: {
+            type: Number,
+            default: 0
+        },
+    },
     data(){
         return {
             name: '',
@@ -138,39 +160,81 @@ export default {
     methods: {
         close_form(){
             this.$emit('closed');
+            console.log("closed");
         },
         async add() {
             const { valid } = await this.$refs.form.validate()
 
             if(valid){
-                this.loading = true;
-                this.axios({
-                    method: 'post',
-                    url: `${fun.SERVER_URL}/add-transaction`,
-                    data: {
-                        name: this.name,
-                        category: this.category_selected == this.categories[0] ? this.other_category : this.category_selected,
-                        currency: "RUB",
-                        amount: this.price
-                    }
-                }).then((response) => {
-                    console.log(response);
-                    this.loading = false;
-                    if(response.status == 200) {
-                        fun.show('Успешно добавлено');
-                        this.close_form();
-                    }
-                    else{
+                if(this.edit_mode){
+                    this.loading = true;
+                    this.axios({
+                        method: 'post',
+                        url: `${fun.SERVER_URL}/change-transaction?id=${encodeURIComponent(this.Eid)}`,
+                        data: {
+                            name: this.name,
+                            category: this.category_selected == this.categories[0] ? this.other_category : this.category_selected,
+                            currency: "RUB",
+                            amount: this.price
+                        }
+                    }).then((response) => {
+                        this.loading = false;
+                        if(response.status == 200) {
+                            fun.show('Успешно изменено');
+                            this.close_form();
+                        }
+                        else{
+                            fun.show('Произошла ошибка, попробуйте позже');
+                        }
+                    }).catch((error) => {
+                        this.loading = false;
                         fun.show('Произошла ошибка, попробуйте позже');
-                    }
-                }).catch((error) => {
-                    this.loading = false;
-                    fun.show('Произошла ошибка, попробуйте позже');
-                });
+                    });
+                }
+                else{
+                    this.loading = true;
+                    this.axios({
+                        method: 'post',
+                        url: `${fun.SERVER_URL}/add-transaction`,
+                        data: {
+                            name: this.name,
+                            category: this.category_selected == this.categories[0] ? this.other_category : this.category_selected,
+                            currency: "RUB",
+                            amount: this.price
+                        }
+                    }).then((response) => {
+                        this.loading = false;
+                        if(response.status == 200) {
+                            fun.show('Успешно добавлено');
+                            this.close_form();
+                        }
+                        else{
+                            fun.show('Произошла ошибка, попробуйте позже');
+                        }
+                    }).catch((error) => {
+                        this.loading = false;
+                        fun.show('Произошла ошибка, попробуйте позже');
+                    });
+                }
             }
         }
     },
     mounted(){
+        console.log('mounted');
+        if(this.edit_mode){
+            console.log('edit mode');
+            console.log(this.Ecategory_selected);
+            this.name = this.Ename;
+            this.price = this.Eprice;
+            console.log(this.categories.filter(c => c != this.Ecategory_selected).length)
+            console.log(this.categories.length)
+            if(this.categories.filter(c => c != this.Ecategory_selected).length >= this.categories.length){
+                this.other_category = this.Ecategory_selected;
+            }
+            else{
+                this.category_selected = this.Ecategory_selected;
+            }
+        }
     },
     setup() {
     }

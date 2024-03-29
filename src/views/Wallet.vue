@@ -4,7 +4,7 @@
             <v-col cols="1" v-if="lgAndUp">
             </v-col>
 
-            <v-col :cols="smAndDown ? 12 : 7">
+            <v-col :cols="mdAndDown ? 12 : 7">
                 <v-row>
                     <v-col cols="12">
                         <v-row>
@@ -78,13 +78,14 @@
                             v-for="val in current_transactions_list"
                             :key="val.id"
                             :subtitle="val.category"
-                            href="#"
+                            
                             class="pa-2"
                         >
                             <div class="d-flex flex-row justify-space-between">
                                 <p class="text-primary font-weight-medium">{{ val.amount }} ₽</p>
                                 <p class="font-weight-medium">{{ val.name }}</p>
                                 <p>{{ fun.format_current_date(val.created_at) }}</p>
+                                <v-btn icon="mdi-pencil" density="comfortable" variant="text" @click="open_edit_form(val.id);"></v-btn>
                             </div>
                         </v-list-item>
                     </v-list>
@@ -102,8 +103,12 @@
         <v-overlay v-model="scanner_opened" class="align-center justify-center">
             <QrScanner @closed="scanner_opened = false; change_period(period_selected);"></QrScanner>
         </v-overlay>
-        <v-overlay v-model="transactin_form_opened" class="align-center justify-center ">
+        <v-overlay v-model="transactin_form_opened" class="align-center justify-center">
             <TransactionForm @closed="transactin_form_opened = false; change_period(period_selected);"></TransactionForm>
+        </v-overlay>
+        <v-overlay v-model="edit_transaction_form_opened" class="align-center justify-center">
+            <TransactionForm :edit_mode="true" :Ename="edit_form.name" :Eprice="edit_form.price" :Ecategory_selected="edit_form.category" :Eid="edit_form.id"
+            @closed="edit_transaction_form_opened = false; change_period(period_selected);"></TransactionForm>
         </v-overlay>
     </ContentWrapper>
 </template>
@@ -183,9 +188,29 @@ export default {
       transactions: [],
       transactions_pro_page: 8,
       transaction_page: 1,
+
+      edit_form: {
+        id: 0,
+        name: '',
+        price: '',
+        category: '',
+      },
+      edit_transaction_form_opened: false,
     };
   },
   methods: {
+    open_edit_form(id){
+        for(let i = 0; i < this.transactions.length; i++){
+            if(this.transactions[i].id == id){
+                this.edit_form.id = id;
+                this.edit_form.name = this.transactions[i].name;
+                this.edit_form.price = String(this.transactions[i].amount);
+                this.edit_form.category = this.transactions[i].category;
+            }
+        }
+
+        this.edit_transaction_form_opened = true;
+    },
     checkNumber(num) {
         if (num >= 1) {
             return num;

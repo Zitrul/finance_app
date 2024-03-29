@@ -128,11 +128,6 @@ export default {
     };
   },
   mounted() {
-    fun.check_auth(this).then(response => {
-      if(response){
-        this.$router.push('/wallet')
-      }
-    })
   },
   methods: {
     handleScroll() {
