@@ -218,10 +218,20 @@ def get_current_price(ticket, date_get):
         date1 = datetime.strptime(inform[1], "%Y-%m-%d")
         if date1 <= datetime.strptime(date_get, "%Y-%m-%d"):
             result["price"] = inform[6]
-
+            result['date'] = inform[1]
     if result == {}:
         new_date = datetime.strptime(date_get, "%Y-%m-%d") - timedelta(days=1)
         return get_current_price(ticket, new_date.strftime('%Y-%m-%d'))
     else:
         print(result)
         return result
+
+def get_current_price_trend(ticket, date_get):
+    result1 = get_current_price(ticket, date_get)
+
+    date1 = datetime.strptime(result1["date"], "%Y-%m-%d")
+    date2 = date1 - timedelta(days=1)
+    result2 = get_current_price(ticket, date2.strftime('%Y-%m-%d'))
+    print(result2)
+    print(result1)
+    return {"trend":str(float(result1["price"]) -float(result2["price"]) )}
