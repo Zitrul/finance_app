@@ -156,7 +156,7 @@ app.post("/change-transaction", authenticate, async (req, res) => {
         const id = req.query.id;
 
         const transaction = await db.Transaction.findOne({
-            where: { 
+            where: {
                 id: id,
                 user_id: req.user["id"],
             },
@@ -337,6 +337,58 @@ app.get("/users-stocks", authenticate, async (req, res) => {
         });
 
         res.status(200).json(stocks);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
+});
+
+app.get("/stock-price", async (req, res) => {
+    const ticker = req.body.ticker;
+
+    axios
+        .get(`http://${process.env.API_IP}:3214/get_current_price`, {
+            params: {
+                ticker: ticker,
+            },
+        })
+        .then((response) => {
+            res.status(200).json(response.data);
+        })
+        .catch((error) => {
+            console.error(error.response.data.detail);
+            res.status(500).json("smth went wrong");
+        });
+});
+
+app.get("/stocks-shareholding", async (req, res) => {
+    try {
+        const shareholding = req.body.shareholding;
+        let prices = {};
+
+        for (stock in shareholding) {
+            const ticker = stock;
+            const amount = shareholding[stock];
+            let price = 0;
+
+            await axios
+                .get(`http://${process.env.API_IP}:3214/get_current_price`, {
+                    params: {
+                        ticker: ticker,
+                    },
+                })
+                .then((response) => {
+                    price = response.data.price;
+                })
+                .catch((error) => {
+                    console.error(error.response.data.detail);
+                    res.status(500).json("smth went wrong");
+                });
+
+            prices[ticker] = amount * price;
+        }
+
+        res.status(200).json(prices);
     } catch (err) {
         console.log(err);
         res.status(500).json("smth went wrong");
