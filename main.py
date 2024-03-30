@@ -9,7 +9,7 @@ from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
 from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_sort, auto_sort_vector, \
-    get_current_price
+    get_current_price, get_current_price_trend
 from classes import stringa, Product
 
 
@@ -153,6 +153,16 @@ def get_current_price_method(ticker: str):
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
     result = get_current_price(ticket= ticker, date_get=current_date)
     return result
+
+
+@app.get("/get_current_price_trend")
+def get_current_price_trend_method(ticker: str):
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+    result = get_current_price_trend(ticket= ticker, date_get=current_date)
+
+    return result
+
 
 if __name__ == "__main__":
 
