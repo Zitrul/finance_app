@@ -25,6 +25,14 @@ class DBmanager:
             self.cur.execute(sql, val)
 
         return "OK"
+    def add_p_transactions(self, user_id, amount, t_type, name):
+
+        sql = "INSERT INTO ProfitableTransaction (name, type, amount, currency, user_id, created_at) VALUES (%s,%s, %s, %s, %s, %s)"
+        val = (str(name), str(t_type), str(amount), str('RUB'), user_id,
+                datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+        self.cur.execute(sql, val)
+
+        return "OK"
 
     def add_news(self, company_name, link, description, created_at):
         sql = "INSERT INTO LatestNews (company_name, link, description, created_at, send_in_telegram) VALUES (%s, %s, %s,  %s, %s)"
@@ -50,8 +58,8 @@ class DBmanager:
         sql = f"UPDATE LatestNews SET send_in_telegram=false WHERE id={int(34)};"
         self.cur.execute(sql)
 
-    def get_users_assets(self):
-        sql = "SELECT company_name FROM UserAssets WHERE news_subscription = true;"
+    def get_users_assets(self, user_id):
+        sql = f"SELECT company_name FROM UserAssets WHERE news_subscription = true AND user_id = {user_id};"
         self.cur.execute(sql)
         companies = self.cur.fetchall()
         return companies
@@ -69,3 +77,4 @@ class DBmanager:
         return companies
     def commit(self):
         self.conn.commit()
+
