@@ -395,6 +395,26 @@ app.get("/stocks-shareholding", async (req, res) => {
     }
 });
 
+app.get("/stock-chart", async (req, res) => {
+    const ticker = req.body.ticker;
+    const month_ago = charts.formatDate(new Date(new Date() - 30 * 24 * 60 * 60 * 1000));
+
+    axios
+        .get(`http://${process.env.API_IP}:3214/get_history`, {
+            params: {
+                ticker: ticker,
+                date_from: month_ago
+            },
+        })
+        .then((response) => {
+            res.status(200).json(response.data);
+        })
+        .catch((error) => {
+            console.error(error.response.data.detail);
+            res.status(500).json("smth went wrong");
+        });
+});
+
 db.sequelize.sync().then((req) => {
     process.env.db = db;
     app.listen(port, () => {

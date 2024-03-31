@@ -208,7 +208,9 @@ async function spendingsBy2Days(days_ago, user_id) {
     const transactions = await db.Transaction.findAll({
         where: {
             created_at: {
-                [sequelize.Op.lt]: new Date(new Date() - miliseconds + 2 * day_in_ms),
+                [sequelize.Op.lt]: new Date(
+                    new Date() - miliseconds + 2 * day_in_ms
+                ),
                 [sequelize.Op.gt]: new Date(new Date() - miliseconds),
             },
             user_id: user_id,
@@ -217,7 +219,7 @@ async function spendingsBy2Days(days_ago, user_id) {
 
     let spendings = 0;
     for (let i = 0; i < transactions.length; i++) {
-        console.log(transactions[i]["amount"])
+        console.log(transactions[i]["amount"]);
         spendings += transactions[i]["amount"];
     }
 
@@ -231,7 +233,9 @@ async function spendingsByWeek(weeks_ago, user_id) {
     const transactions = await db.Transaction.findAll({
         where: {
             created_at: {
-                [sequelize.Op.lt]: new Date(new Date() - miliseconds + week_in_ms),
+                [sequelize.Op.lt]: new Date(
+                    new Date() - miliseconds + week_in_ms
+                ),
                 [sequelize.Op.gt]: new Date(new Date() - miliseconds),
             },
             user_id: user_id,
@@ -294,9 +298,21 @@ async function spendingsByMonth(months_ago, user_id) {
     return spendings;
 }
 
+function formatDate(date) {
+    const formattedDateNow =
+        date.getFullYear() +
+        "-" +
+        (date.getMonth() + 1).toString().padStart(2, "0") +
+        "-" +
+        date.getDate().toString().padStart(2, "0");
+
+    return formattedDateNow;
+}
+
 module.exports = {
     transactionsByPeriod: transactionsByPeriod,
     categoriesAmounts: categoriesAmounts,
     top6Categories: top6Categories,
     spendingsByPeriod: spendingsByPeriod,
+    formatDate: formatDate,
 };
