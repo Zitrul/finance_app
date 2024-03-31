@@ -87,12 +87,12 @@ def get_last_news_tg():
 
 
 @app.get("/get_users_subscription")
-def get_users_subscription():
+def get_users_subscription(user_id:str):
     db = DBmanager()
-    subs = db.get_users_assets()
+    subs = db.get_users_assets(int(user_id))
     db.commit()
     response = dict()
-    response["subs"] = subs
+    response["subs"] = []
     for i in subs:
         response["subs"].append(i[0])
     return response
@@ -162,7 +162,12 @@ def get_current_price_trend_method(ticker: str):
     result = get_current_price_trend(ticket= ticker, date_get=current_date)
 
     return result
-
+@app.post("/add_profit_transaction")
+def add_profit_transaction(user_id : str, name : str, category : str, amount : str):
+    db = DBmanager()
+    db.add_p_transactions(user_id, amount, category, name)
+    db.commit()
+    return {"OK":"OK"}
 
 if __name__ == "__main__":
 
