@@ -415,6 +415,31 @@ app.get("/stock-chart", async (req, res) => {
         });
 });
 
+app.post("/add-profit", authenticate, async (req, res) => {
+    try {
+        const user_id = req.user["id"];
+        const name = req.body.name;
+        const amount = parseFloat(req.body.amount);
+        const category = req.body.category;
+        const currency = req.body.currency;
+        if (amount >= 0.01) {
+            await db.ProfitableTransaction.create({
+                user_id: user_id,
+                name: name,
+                amount: amount,
+                category: category,
+                currency: currency,
+            });
+            res.status(200).json("succeeded");
+        } else {
+            res.status(400).json("Указана неверная сумма");
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
+});
+
 db.sequelize.sync().then((req) => {
     process.env.db = db;
     app.listen(port, () => {
