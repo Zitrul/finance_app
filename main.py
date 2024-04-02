@@ -54,8 +54,13 @@ def add_product(user_id: str, name: str, amount: str, category: str, currency: s
 
 @app.post("/add_user_assets")
 def add_user_assets(user_id: str, company_name: str, asset_amount: str, news_subscription: str, stock_quote: str):
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+    result = get_current_price(ticket=stock_quote, date_get=current_date)
+    print("sasdasdsaaaaaaaaaaa", result)
+    asset_buy_price = result["price"]
     db = DBmanager()
-    db.add_users_asset(company_name, news_subscription, user_id, asset_amount, stock_quote)
+    db.add_users_asset(company_name, news_subscription, user_id, asset_amount, stock_quote, asset_buy_price)
     db.commit()
     return {"OK": "OK"}
 
@@ -161,6 +166,13 @@ def get_current_price_trend_method(ticker: str):
 
     result = get_current_price_trend(ticket= ticker, date_get=current_date)
 
+    return result
+
+@app.get("/get_user_assets")
+def get_user_assets(user_id: str):
+    db = DBmanager()
+    result = db.get_users_assets(user_id)
+    db.commit()
     return result
 @app.post("/add_profit_transaction")
 def add_profit_transaction(user_id : str, name : str, category : str, amount : str):
