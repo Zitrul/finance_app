@@ -64,17 +64,31 @@ class DBmanager:
         companies = self.cur.fetchall()
         return companies
 
-    def add_users_asset(self, company_name,news_subscription, user_id, asset_amount,stock_quote):
+    def add_users_asset(self, company_name,news_subscription, user_id, asset_amount,stock_quote, asset_buy_price):
         if news_subscription == "true":
             news_subscription = 1
         elif news_subscription == "True":
             news_subscription = 1
         else:
             news_subscription = 0
-        sql = "INSERT INTO UserAssets (company_name, news_subscription, user_id, asset_amount, created_at, stock_quote,  updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s);"
-        self.cur.execute(sql, (company_name, news_subscription, user_id, asset_amount, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"), stock_quote, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
+        sql = "INSERT INTO UserAssets (company_name,asset_buy_price, news_subscription, user_id, asset_amount, created_at, stock_quote,  updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+        self.cur.execute(sql, (company_name,asset_buy_price, news_subscription, user_id, asset_amount, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"), stock_quote, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
         companies = self.cur.fetchall()
         return companies
+    def get_users_assets(self, user_id):
+        sql = f"SELECT company_name, stock_quote, asset_amount, asset_buy_price  FROM UserAssets WHERE user_id = {user_id};"
+        self.cur.execute(sql)
+        companies = self.cur.fetchall()
+        result = {}
+        for i in companies:
+            if i[1] in result:
+                result[i[1]]["price"] += float(i[2]) * float(i[3])
+                result[i[1]]["amount"] += float(i[2])
+            else:
+                result[i[1]] = {}
+                result[i[1]]["price"] = float(i[2]) * float(i[3])
+                result[i[1]]["amount"] = float(i[2])
+        return result
     def commit(self):
         self.conn.commit()
 
