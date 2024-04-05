@@ -7,7 +7,7 @@ import requests
 from pyzbar import pyzbar
 import cv2
 from glob import glob
-
+import pandas as pd
 import DBmanager
 from classes import Product
 
@@ -235,3 +235,14 @@ def get_current_price_trend(ticket, date_get):
     print(result2)
     print(result1)
     return {"trend":str(float(result1["price"]) -float(result2["price"]) )}
+def get_times_candle(date_start, delta, ticker):
+    date_end = (date_start - timedelta(days=delta)).strftime("%Y-%m-%d")
+    date_start = date_start.strftime("%Y-%m-%d")
+    j = requests.get(f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_start}&interval=24').json()
+    data = [{k : r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
+
+    frame = pd.DataFrame(data)
+    prices = list(frame['close'])
+    time = list(frame['end'])
+    #print(time, prices, len(time), len(prices))
+    return {"time": time, "prices": prices}
