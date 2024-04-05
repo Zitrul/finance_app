@@ -9,7 +9,7 @@ from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
 from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_sort, auto_sort_vector, \
-    get_current_price, get_current_price_trend
+    get_current_price, get_current_price_trend, get_times_candle
 from classes import stringa, Product
 
 
@@ -180,6 +180,15 @@ def add_profit_transaction(user_id : str, name : str, category : str, amount : s
     db.add_p_transactions(user_id, amount, category, name)
     db.commit()
     return {"OK":"OK"}
+
+
+
+@app.get("/get_candle")
+def get_time_candle(ticker: str, timedelta : str):
+    return get_times_candle(datetime.datetime.now(), int(timedelta) ,ticker)
+
+
+
 
 if __name__ == "__main__":
 
