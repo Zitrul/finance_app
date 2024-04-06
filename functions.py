@@ -246,3 +246,18 @@ def get_times_candle(date_start, delta, ticker):
     time = list(frame['end'])
     #print(time, prices, len(time), len(prices))
     return {"time": time, "prices": prices}
+
+def get_times_candle_m(date_start, delta, ticker):
+    delta = 0
+    if datetime.weekday(date_start) >= 5:
+        delta = datetime.weekday(date_start)-4
+    date_end = (date_start - timedelta(days=delta)).strftime("%Y-%m-%d")
+
+    j = requests.get(f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_end}&interval=1m').json()
+    data = [{k : r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
+
+    frame = pd.DataFrame(data)
+    prices = list(frame['close'])
+    time = list(frame['end'])
+    #print(time, prices, len(time), len(prices))
+    return {"time": time, "prices": prices}
