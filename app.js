@@ -45,29 +45,25 @@ app.use(express.static(path.join(__dirname, "dist")));
 // -------------------------------------------------------------------------------------------------------------------------------------------
 
 // authentication routes
-app.use('/authentication', authenticationRoutes);
+app.use('/api/authentication', authenticationRoutes);
 
 // transaction routes
-app.use('/transactions', transactionRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 // chart routes
-app.use('/charts', chartRoutes);
+app.use('/api/charts', chartRoutes);
 
 // stocks routes
-app.use('/stocks', stocksRoutes);
+app.use('/api/stocks', stocksRoutes);
 
-
-// -------------------------------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------------------------------
-
-app.get("/all-news", mid.authenticate, async (req, res) => {
+app.get("/api/all-news", mid.authenticate, async (req, res) => {
     const user_id = req.user["id"];
     const news = await db.LatestNews.findAll();
 
     res.json(news);
 });
 
-app.get("/check-api", (req, res) => {
+app.get("/api/check-api", (req, res) => {
     axios
         .get(`http://${process.env.API_IP}:3214/?name=a`)
         .then((response) => {
@@ -78,7 +74,7 @@ app.get("/check-api", (req, res) => {
         });
 });
 
-app.get("/token-test", mid.authenticate, (req, res) => {
+app.get("/api/token-test", mid.authenticate, (req, res) => {
     res.status(200).json({
         msg: "Authenticated!",
         user: req.user,
@@ -88,6 +84,10 @@ app.get("/token-test", mid.authenticate, (req, res) => {
 // app.get("*", (req, res) => {
 //   res.sendFile(path.join(__dirname, "dist", "index.html"));
 // });
+
+// -------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------
+
 
 db.sequelize.sync().then((req) => {
     app.listen(port, () => {
