@@ -49,4 +49,23 @@ export default {
 .text_title_color{
   color: #9cbbc6;
 }
+
+.message-error{
+    position: fixed;
+    top: 10vh;
+    right: -200px;
+    background-color: #ff2d1f;
+    color: white;
+    padding: 10px;
+    transition: transform 0.5s, opacity 0.5s;
+}
+.message-success{
+    position: fixed;
+    top: 10vh;
+    right: -200px;
+    background-color: green;
+    color: white;
+    padding: 10px;
+    transition: transform 0.5s, opacity 0.5s;
+}
 </style>

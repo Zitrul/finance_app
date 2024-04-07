@@ -177,15 +177,15 @@ export default {
                 console.log(response);
                 this.loading = false;
                 if(response.status == 200) {
-                    fun.show('успешно добавлено');
+                    fun.show('Успешно добавлено', true);
                     this.close_form();
                 }
                 else{
-                    fun.show('error');
+                    fun.show('Произошла неизвестная ошибка');
                 }
             }).catch((error) => {
                 this.loading = false;
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             });
         }
     },

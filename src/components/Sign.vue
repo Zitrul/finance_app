@@ -161,15 +161,15 @@ export default {
                 if(response.status == 200) {
                     this.$cookies.set('accessToken', response.data.accessToken);
                     this.$cookies.set('refreshToken', response.data.refreshToken);
-                    fun.show('success');
+                    fun.show('Успешный вход в аккаунт', true);
                     // this.emit_closing();
                     this.$router.push('/wallet');
                 }
                 else{
-                    fun.show('error');
+                    fun.show('Произошла неизвестная ошибка');
                 }
             }).catch((error) => {
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             });
         },
         signup() {
@@ -186,14 +186,14 @@ export default {
                 console.log(response);
                 this.loading = false;
                 if(response.status == 200) {
-                    fun.show('success');
+                    fun.show('Успешный вход в аккаунт', true);
                     this.change_form();
                 }
                 else{
-                    fun.show('error');
+                    fun.show('Произошла неизвестная ошибка');
                 }
             }).catch((error) => {
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             });
         },
     },

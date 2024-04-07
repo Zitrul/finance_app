@@ -180,7 +180,7 @@ export default {
                     }).then((response) => {
                         this.loading = false;
                         if(response.status == 200) {
-                            fun.show('Успешно изменено');
+                            fun.show('Успешно изменено', true);
                             this.close_form();
                         }
                         else{
@@ -205,7 +205,7 @@ export default {
                     }).then((response) => {
                         this.loading = false;
                         if(response.status == 200) {
-                            fun.show('Успешно добавлено');
+                            fun.show('Успешно добавлено', true);
                             this.close_form();
                         }
                         else{

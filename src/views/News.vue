@@ -98,11 +98,11 @@ export default {
                 this.loading_content = false;
             }
             else{
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('error');
+            fun.show('Произошла неизвестная ошибка');
         });
     },
   },

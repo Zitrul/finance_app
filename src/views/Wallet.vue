@@ -247,11 +247,11 @@ export default {
                 this.transactions = response.data;
             }
             else{
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('error');
+            fun.show('Произошла неизвестная ошибка');
         });
     },
     async bar_chart(){
@@ -327,11 +327,11 @@ export default {
                 }
             }
             else{
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('error');
+            fun.show('Произошла неизвестная ошибка');
         });
     },
     async pie_chart(){
@@ -386,11 +386,11 @@ export default {
                 }
             }
             else{
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('error');
+            fun.show('Произошла неизвестная ошибка');
         });
     },
     async line_chart(){
@@ -443,11 +443,11 @@ export default {
                 }
             }
             else{
-                fun.show('error');
+                fun.show('Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('error');
+            fun.show('Произошла неизвестная ошибка');
         });
     },
   },

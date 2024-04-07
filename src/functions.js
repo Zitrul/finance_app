@@ -4,8 +4,21 @@ function get_cookie(obj, key){
     return obj.$cookies.get(key);
 }
 
-function show(msg){
-    alert(msg);
+function show(msg, status=false){
+    const message = document.createElement('div');
+    message.className = status ? 'message-success' : 'message-error';
+    message.textContent = msg;
+
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+        message.style.transform = 'translateX(-200px)';
+        message.style.opacity = '1';
+    }, 20);
+    
+    setTimeout(() => {
+        message.style.opacity = '0';
+    }, 2000);
 }
 
 async function check_auth(obj){
