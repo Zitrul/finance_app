@@ -1,11 +1,11 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-
 
 const db = require("../models");
 const mid = require("../middlewares");
 const auth = require("../functions/auth.js");
 const bcrypt = require("bcrypt");
+const sequelize = require("sequelize");
 
 router.post("/register", async (req, res) => {
     try {
@@ -26,9 +26,13 @@ router.post("/register", async (req, res) => {
                         username: username,
                         email_auth: email,
                         password: hash.toString(),
-                        telegram_bot_token: require("crypto")
-                            .randomBytes(32)
-                            .toString("hex"),
+                        telegram_bot_token:
+                            require("crypto").randomBytes(16).toString("hex") +
+                            encodeURIComponent(
+                                bcrypt
+                                    .hashSync(username, bcrypt.genSaltSync()) // 16 random hex symbols + 16 symbols of hashed username
+                                    .toString()
+                            ).substring(0, 16),
                     },
                 });
                 if (created) {

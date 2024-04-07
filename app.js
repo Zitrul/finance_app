@@ -15,6 +15,7 @@ const authenticationRoutes = require('./routes/authenticationRoutes.js');
 const transactionRoutes = require('./routes/transactionRoutes.js');
 const chartRoutes = require('./routes/chartRoutes.js');
 const stocksRoutes = require('./routes/stocksRoutes.js');
+const accountRoutes = require('./routes/accountRoutes.js');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -55,6 +56,9 @@ app.use('/api/charts', chartRoutes);
 
 // stocks routes
 app.use('/api/stocks', stocksRoutes);
+
+// account routes
+app.use('/api/account', accountRoutes);
 
 app.get("/api/all-news", mid.authenticate, async (req, res) => {
     const user_id = req.user["id"];
