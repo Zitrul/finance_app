@@ -170,7 +170,7 @@ export default {
                     this.loading = true;
                     this.axios({
                         method: 'post',
-                        url: `${fun.SERVER_URL}/change-transaction?id=${encodeURIComponent(this.Eid)}`,
+                        url: `${fun.SERVER_URL}/transactions/change-transaction?id=${encodeURIComponent(this.Eid)}`,
                         data: {
                             name: this.name,
                             category: this.category_selected == this.categories[0] ? this.other_category : this.category_selected,
@@ -195,7 +195,7 @@ export default {
                     this.loading = true;
                     this.axios({
                         method: 'post',
-                        url: `${fun.SERVER_URL}/add-transaction`,
+                        url: `${fun.SERVER_URL}/transactions/add-transaction`,
                         data: {
                             name: this.name,
                             category: this.category_selected == this.categories[0] ? this.other_category : this.category_selected,

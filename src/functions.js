@@ -1,4 +1,4 @@
-const SERVER_URL = "http://localhost:3000";
+const SERVER_URL = "http://localhost:3000/api";
 
 function get_cookie(obj, key){
     return obj.$cookies.get(key);

@@ -238,7 +238,7 @@ export default {
     fetch_transactions(){
         this.axios({
             method: 'post',
-            url: `${fun.SERVER_URL}/all-transactions`,
+            url: `${fun.SERVER_URL}/transactions/all-transactions`,
             data: {
                 period: this.periods[this.period_selected].code,
             }
@@ -257,7 +257,7 @@ export default {
     async bar_chart(){
         this.axios({
             method: 'post',
-            url: `${fun.SERVER_URL}/bar-chart`,
+            url: `${fun.SERVER_URL}/charts/bar-chart`,
             data: {
                 period: this.periods[this.period_selected].code,
             }
@@ -337,7 +337,7 @@ export default {
     async pie_chart(){
         this.axios({
             method: 'post',
-            url: `${fun.SERVER_URL}/pie-chart`,
+            url: `${fun.SERVER_URL}/charts/pie-chart`,
             data: {
                 period: this.periods[this.period_selected].code,
             }
@@ -396,7 +396,7 @@ export default {
     async line_chart(){
         this.axios({
             method: 'post',
-            url: `${fun.SERVER_URL}/line-chart`,
+            url: `${fun.SERVER_URL}/charts/line-chart`,
             data: {
                 period: this.periods[this.period_selected].code,
             }

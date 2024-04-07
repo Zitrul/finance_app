@@ -13,6 +13,7 @@ const myDarkTheme = {
     surface: '#0c1d27',
     primary: '#d5573b',
     text_title: '#9cbbc6',
+    sell: '#bc2402',
   },
   variables: {
     'border-color': '#d5573b',

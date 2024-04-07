@@ -150,7 +150,7 @@ export default {
             this.loading = true;
             this.axios({
                 method: 'post',
-                url: `${fun.SERVER_URL}/login`,
+                url: `${fun.SERVER_URL}/authentication/login`,
                 data: {
                     username: this.login.username,
                     password: this.login.password
@@ -176,7 +176,7 @@ export default {
             this.loading = true;
             this.axios({
                 method: 'post',
-                url: `${fun.SERVER_URL}/register`,
+                url: `${fun.SERVER_URL}/authentication/register`,
                 data: {
                     username: this.signup_form.username,
                     email: this.signup_form.email,

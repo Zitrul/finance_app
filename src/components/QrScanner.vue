@@ -169,7 +169,7 @@ export default {
             this.loading = true;
             this.axios({
                 method: 'post',
-                url: `${fun.SERVER_URL}/scan-detected-qr`,
+                url: `${fun.SERVER_URL}/transactions/scan-detected-qr`,
                 data: {
                     data: detectedCodes["content"],
                 }
