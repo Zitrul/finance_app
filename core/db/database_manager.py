@@ -1,6 +1,8 @@
 import aiomysql
 import bcrypt
 import mysql.connector
+import aiohttp
+import json
 
 from core.settings import *
 
@@ -97,7 +99,44 @@ class DatabaseManager:
                 await cur.execute(query, (telegram_id,))
                 user = await cur.fetchone()
                 return dict(user) if user else None
+            
+    async def get_all_amount_salary(self, telegram_id : int) -> int:
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    query = f"SELECT id FROM User WHERE telegram_auth = '{telegram_id}'"
+                    await cur.execute(query)
+                    user_id = await cur.fetchone()
+                    query = f"SELECT amount FROM ProfitableTransaction WHERE user_id = '{user_id[0]}'"
+                    await cur.execute(query)
+                    return sum([int(elem[0]) for elem in await cur.fetchall()])
 
+    async def get_all_amount_share(self, telegram_id : int) -> int:
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                query = f"SELECT id FROM User WHERE telegram_auth = '{telegram_id}'"
+                await cur.execute(query)
+                user_id = await cur.fetchone()
+                query = f"SELECT stock_quote, asset_amount FROM UserAssets WHERE user_id = '{user_id[0]}'"
+                await cur.execute(query)
+                api = f'http://{HOST}:{PORT_API}/get_current_price?ticker='
+                price_share = []
+                for elem in await cur.fetchall():
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(api + elem[0]) as resp:
+
+                            price_share.append(int(json.loads(await resp.text())["price"]) * int(elem[1]))
+                return sum(price_share)
+
+
+    async def get_all_transaction_amount(self, telegram_id: int) -> list:
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                query = f"SELECT id FROM User WHERE telegram_auth = '{telegram_id}'"
+                await cur.execute(query)
+                user_id = await cur.fetchone()
+                query = f"SELECT amount FROM Transaction WHERE user_id = '{user_id[0]}'"
+                await cur.execute(query)
+                return [int(elem[0]) for elem in await cur.fetchall()]
     async def is_user_by_telegram_id(self, telegram_id: int) -> bool:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:

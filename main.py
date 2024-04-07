@@ -37,6 +37,7 @@ async def start():
     dp.message.register(set_password, FormLogin.password)
 
     # callback
+    dp.callback_query.register(show_report, F.data == "get_report")
     dp.callback_query.register(get_menu, F.data == "menu")
     dp.callback_query.register(start_login, F.data == "log_in")
     dp.callback_query.register(handle_get_data, F.data == "get_data")

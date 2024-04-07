@@ -14,6 +14,7 @@ def get_main_menu_keyboard():
     keyboard_builder.button(text="🧾 Отправить QR", callback_data="send_QR")
     keyboard_builder.button(text="🗂 Транзакции", callback_data='page_next_0')
     keyboard_builder.button(text="Внести ЗП", callback_data="deposite_money")
+    keyboard_builder.button(text='📄 Отчет', callback_data='get_report')
     return keyboard_builder.adjust(1, 1).as_markup()
 
 

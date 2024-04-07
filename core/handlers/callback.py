@@ -13,6 +13,11 @@ async def start_login(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await bot.send_message(callback.message.chat.id, f"Введите ваш login:")
     await state.set_state(FormLogin.login)
 
+async def show_report(callback: CallbackQuery, bot : Bot, db_manager : DatabaseManager):
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text='↩️ В меню', callback_data='menu')
+    await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text=f'Всего трат: {sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB\nСтоимость акций: {await db_manager.get_all_amount_share(callback.from_user.id)} RUB\nВсего заработано: {await db_manager.get_all_amount_salary(callback.from_user.id)} RUB\nБаланс: {await db_manager.get_all_amount_salary(callback.from_user.id) + await db_manager.get_all_amount_share(callback.from_user.id) - sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB', reply_markup=keyboard_builder.as_markup())
+
 
 async def handle_qr(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await callback.answer()
