@@ -12,7 +12,6 @@ from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_
     get_current_price, get_current_price_trend, get_times_candle, get_times_candle_m
 from classes import stringa, Product
 
-
 first_time_tg = ""
 first_time = ""
 app = FastAPI()
@@ -67,7 +66,7 @@ def add_user_assets(user_id: str, company_name: str, asset_amount: str, news_sub
 
 @app.get("/get_qr_info")
 def add_user_assets(user_id: str, qr_data: str, auto_sort: str):
-    response = add_by_qr_info(auto_change= auto_sort, user_id=int(user_id), qr_data= qr_data)
+    response = add_by_qr_info(auto_change=auto_sort, user_id=int(user_id), qr_data=qr_data)
     return {"info": response}
 
 
@@ -92,7 +91,7 @@ def get_last_news_tg():
 
 
 @app.get("/get_users_subscription")
-def get_users_subscription(user_id:str):
+def get_users_subscription(user_id: str):
     db = DBmanager()
     subs = db.get_users_assets(int(user_id))
     db.commit()
@@ -101,7 +100,6 @@ def get_users_subscription(user_id:str):
     for i in subs:
         response["subs"].append(i[0])
     return response
-
 
 
 @app.get("/items/{item_id}")
@@ -149,14 +147,14 @@ async def create_upload_file(uploaded_file: UploadFile = File(), user_id: str = 
 @app.get("/get_history")
 def get_history_method(ticker: str, date_from: str):
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    result = get_history(ticket= ticker, date_end=current_date, date_start=date_from)
+    result = get_history(ticket=ticker, date_end=current_date, date_start=date_from)
     return result
 
 
 @app.get("/get_current_price")
 def get_current_price_method(ticker: str):
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    result = get_current_price(ticket= ticker, date_get=current_date)
+    result = get_current_price(ticket=ticker, date_get=current_date)
     return result
 
 
@@ -164,9 +162,10 @@ def get_current_price_method(ticker: str):
 def get_current_price_trend_method(ticker: str):
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
 
-    result = get_current_price_trend(ticket= ticker, date_get=current_date)
+    result = get_current_price_trend(ticket=ticker, date_get=current_date)
 
     return result
+
 
 @app.get("/get_user_assets")
 def get_user_assets(user_id: str):
@@ -174,24 +173,36 @@ def get_user_assets(user_id: str):
     result = db.get_users_assets(user_id)
     db.commit()
     return result
+
+
 @app.post("/add_profit_transaction")
-def add_profit_transaction(user_id : str, name : str, category : str, amount : str):
+def add_profit_transaction(user_id: str, name: str, category: str, amount: str):
     db = DBmanager()
     db.add_p_transactions(user_id, amount, category, name)
     db.commit()
-    return {"OK":"OK"}
-
+    return {"OK": "OK"}
 
 
 @app.get("/get_candle")
-def get_time_candle(ticker: str, timedelta : str):
+def get_time_candle(ticker: str, timedelta: str):
     if timedelta == 1:
-        return get_times_candle_m(datetime.datetime.now(), 0 , ticker)
-    return get_times_candle(datetime.datetime.now(), int(timedelta) ,ticker)
+        return get_times_candle_m(datetime.datetime.now(), 0, ticker)
+    return get_times_candle(datetime.datetime.now(), int(timedelta), ticker)
 
 
+@app.post("/modify_user_assets")
+def modify_user_assets(user_id: str, ticker : str, asset_amount: str):
+    db = DBmanager()
+    response = db.modify_users_assets(int(user_id), int(asset_amount), ticker)
+    db.commit()
+    return response
 
+@app.get("/get_transactions_by_date")
+def get_transactions_by_date_controller(user_id: str, datefrom: str):
+    db = DBmanager()
+    result = db.get_transactions_by_date(user_id, datefrom)
+    db.commit()
+    return result
 
 if __name__ == "__main__":
-
     uvicorn.run(app, host="0.0.0.0", port=3214)
