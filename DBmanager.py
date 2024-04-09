@@ -76,7 +76,7 @@ class DBmanager:
         companies = self.cur.fetchall()
         return companies
     def get_users_assets(self, user_id):
-        sql = f"SELECT company_name, stock_quote, asset_amount, asset_buy_price  FROM UserAssets WHERE user_id = {user_id};"
+        sql = f"SELECT company_name, stock_quote, asset_amount, asset_buy_price   FROM UserAssets WHERE user_id = {user_id};"
         self.cur.execute(sql)
         companies = self.cur.fetchall()
         result = {}
@@ -88,6 +88,71 @@ class DBmanager:
                 result[i[1]] = {}
                 result[i[1]]["price"] = float(i[2]) * float(i[3])
                 result[i[1]]["amount"] = float(i[2])
+        return result
+    def modify_users_assets(self, user_id,amount_to_sell, ticker):
+        sql = f"SELECT id, asset_amount, asset_buy_price FROM UserAssets WHERE stock_quote = '{ticker}' AND user_id = {user_id};"
+        self.cur.execute(sql)
+        ticker_amounts = self.cur.fetchall()
+
+        print(ticker_amounts)
+
+        if len(ticker_amounts) == 0:
+            return {"error":"No such ticker"}
+
+        dict_how_many = {}
+        sold_on_price = 0
+        sum = amount_to_sell
+        for i in range(len(ticker_amounts)):
+            if float(ticker_amounts[i][1]) < sum:
+                sold_on_price += float(ticker_amounts[i][1]) * float(ticker_amounts[i][2])
+                dict_how_many[float(ticker_amounts[i][0])] = 0
+                sum -= float(ticker_amounts[i][1])
+            else:
+
+                sold_on_price += (sum) * float(ticker_amounts[i][2])
+                dict_how_many[float(ticker_amounts[i][0])] = float(ticker_amounts[i][1])-sum
+                sum = 0
+                break
+        if sum != 0:
+            return {"error": "No enough assets available"}
+
+        print(dict_how_many)
+
+        for id in dict_how_many.keys():
+            if dict_how_many[id] != 0:
+                sql = f"UPDATE UserAssets SET asset_amount = {dict_how_many[id]} WHERE id = {id} AND user_id = {user_id};"
+                self.cur.execute(sql)
+            else:
+                sql = f"DELETE FROM UserAssets WHERE id = {id} AND user_id = {user_id};"
+                self.cur.execute(sql)
+
+        return {"success": True,
+                "sell_on_price":sold_on_price}
+    def get_transactions_by_date(self, user_id, from_date):
+        sql = f"SELECT created_at, amount FROM Transaction WHERE user_id = {user_id};"
+        self.cur.execute(sql)
+        transactions = self.cur.fetchall()
+
+        sql = f"SELECT created_at, amount FROM ProfitableTransaction WHERE user_id = {user_id};"
+        self.cur.execute(sql)
+        profitable_transactions = self.cur.fetchall()
+
+        start_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
+        end_date = datetime.datetime.now()
+        day = start_date + datetime.timedelta(days=1)
+        print(transactions)
+        print(profitable_transactions)
+        result = dict()
+        for i in range((end_date - start_date).days):
+            day = day + datetime.timedelta(days=1)
+            day_string = day.strftime('%Y-%m-%d')
+            result[day_string] = 0
+            for profit in profitable_transactions:
+                if profit[0] <= day:
+                    result[day_string] += float(profit[1])
+            for transaction in transactions:
+                if transaction[0] <= day:
+                    result[day_string] -= float(transaction[1])
         return result
     def commit(self):
         self.conn.commit()
