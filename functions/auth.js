@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 function generateAccessToken(user) {
     return jwt.sign({
-        username: user.username,
+        id: user.id,
         time: new Date().getTime(),
     }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "30m",
@@ -13,21 +13,21 @@ function generateAccessToken(user) {
 
 async function createRefreshToken(user, db) {
     return (await db.RefreshToken.create({
-        token: jwt.sign(user, process.env.REFRESH_TOKEN_SECRET),
-        username: user.username
+        token: jwt.sign({id: user.id}, process.env.REFRESH_TOKEN_SECRET),
+        user_id: user.id
     })).token;
 }
 
-async function checkRefreshToken(username, refreshToken, db) {
+async function checkRefreshToken(id, refreshToken, db) {
     await db.User.findOne({
         where: {
-            username: username,
+            id: id,
         },
     });
 
     const token = await db.RefreshToken.findOne({
         where: {
-            username: username,
+            user_id: id,
             token: refreshToken
         },
     });

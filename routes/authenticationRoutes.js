@@ -60,10 +60,15 @@ router.post("/login", async (req, res) => {
         userFound &&
         (await bcrypt.compare(req.body.password, userFound.password)) // comparing hashes of passwords
     ) {
-        const accessToken = auth.generateAccessToken(user);
-        const refreshToken = await auth.createRefreshToken(user, db);
+        console.log('fe 1')
+        const accessToken = auth.generateAccessToken(userFound);
+        console.log('fe 2')
+        const refreshToken = await auth.createRefreshToken(userFound, db);
+        console.log('fe 3')
         res.cookie("accessToken", accessToken);
+        console.log('fe 4')
         res.cookie("refreshToken", refreshToken);
+        console.log('fe 5')
         res.status(200).json({
             accessToken: accessToken,
             refreshToken: refreshToken,

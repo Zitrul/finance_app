@@ -21,18 +21,18 @@ function open(req, res, next) {
 
             // Проверяем действительность refresh token
             jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
-                if (err || !(await auth.checkRefreshToken(user.username, refreshToken, db) ) ) {
+                if (err || !(await auth.checkRefreshToken(user.user_id, refreshToken, db) ) ) {
                     return res.sendStatus(403); // Недействительный refresh token
                 }
                 // Генерируем новый access token и продолжаем выполнение запроса
                 const newAccessToken = auth.generateAccessToken(user);
-                req.user = await db.User.findOne({ where: { username: user.username } });
+                req.user = await db.User.findOne({ where: { id: user.user_id } });
                 res.cookie("accessToken", newAccessToken);
                 next();
             });
         } else {
             // Access token действителен
-            req.user = await db.User.findOne({ where: { username: user.username } });;
+            req.user = await db.User.findOne({ where: { id: user.id } });;
             next();
         }
     });

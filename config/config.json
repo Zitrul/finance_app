@@ -3,21 +3,21 @@
     "username": "sigma",
     "password": "j$sdjk!53",
     "database": "main_db",
-    "host": "46.188.100.158",
+    "host": "188.244.45.3",
     "dialect": "mysql"
   },
   "test": {
     "username": "sigma",
     "password": "j$sdjk!53",
     "database": "main_db",
-    "host": "46.188.100.158",
+    "host": "188.244.45.3",
     "dialect": "mysql"
   },
   "production": {
     "username": "sigma",
     "password": "j$sdjk!53",
     "database": "main_db",
-    "host": "46.188.100.158",
+    "host": "188.244.45.3",
     "dialect": "mysql"
   }
 }
