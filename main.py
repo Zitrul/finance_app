@@ -47,6 +47,7 @@ async def start():
     dp.callback_query.register(change_deposit, F.data == "change_deposite")
     dp.callback_query.register(handle_deposite_money, F.data == "deposite_money")
     dp.callback_query.register(process_data_navigation, F.data.startswith("page_"))
+    dp.callback_query.register(handle_show_visuals, F.data == 'get_visuals')
 
     # change email
     dp.callback_query.register(handle_change_email, F.data == "change_email")

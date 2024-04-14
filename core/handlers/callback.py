@@ -1,11 +1,17 @@
+import json
+
+import aiohttp
 from aiogram import Bot
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile
+import matplotlib.pyplot as plt
+from telebot.types import InputFile
 
 from core.db.database_manager import DatabaseManager
 from core.forms.forms import *
 from core.keyboards.inline import *
+from core.settings import HOST, PORT_API
 
 
 async def start_login(callback: CallbackQuery, state: FSMContext, bot: Bot):
@@ -147,3 +153,33 @@ async def handle_add_transaction(callback: CallbackQuery, state: FSMContext, bot
     await callback.answer()
     await bot.send_message(callback.message.chat.id, '[1/4] Введите <b>название</b> товара:')
     await state.set_state(FormTransaction.name)
+
+
+async def handle_show_visuals(callback: CallbackQuery, state: FSMContext, bot: Bot, db_manager: DatabaseManager):
+    await callback.answer()
+
+    user_id = (await db_manager.get_user_by_telegram_id(callback.from_user.id))['id']
+    cur_date = "2024-04-01"
+
+    api_request = f"http://{HOST}:{PORT_API}/get_transactions_by_date?user_id={user_id}&datefrom={cur_date}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(api_request) as resp:
+            data = json.loads((await resp.text()))
+
+    dates = list(data.keys())
+    values = list(data.values())
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(dates, values, marker='o')
+    plt.xlabel('Дата')
+    plt.ylabel('Траты')
+    plt.title(f'График трат от {cur_date}')
+    plt.grid(True)
+    plt.xticks(rotation=45)
+
+    plt.savefig('plot.png')  # Сохраняем график как изображение
+
+    chat_id = callback.message.chat.id
+    await bot.send_photo(chat_id, FSInputFile("plot.png"))
+

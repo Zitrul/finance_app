@@ -26,9 +26,10 @@ def get_main_menu_keyboard():
     keyboard_builder.button(text="🧾 Отправить QR", callback_data="send_QR")
     keyboard_builder.button(text="🗂 Транзакции", callback_data='page_next_0')
     keyboard_builder.button(text="Внести ЗП", callback_data="deposite_money")
-    keyboard_builder.button(text="✏ Изменить затраты / доходы", callback_data="change_money_info")
+    keyboard_builder.button(text="✏ Затраты / Доходы", callback_data="change_money_info")
     keyboard_builder.button(text='📄 Отчет', callback_data='get_report')
-    return keyboard_builder.adjust(1, 1).as_markup()
+    keyboard_builder.button(text='📈 График трат', callback_data='get_visuals')
+    return keyboard_builder.adjust(2, repeat=True).as_markup()
 
 
 def get_about_menu_keyboard():
