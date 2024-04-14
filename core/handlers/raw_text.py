@@ -142,6 +142,22 @@ async def new_email(message: Message, state: FSMContext, bot: Bot, db_manager: D
         await bot.send_message(message.chat.id, 'Неверный формат почты!')
     await state.clear()
 
+async def handle_change_deposit_amount(message : Message, state : FSMContext, bot : Bot, db_manager : DatabaseManager):
+    await state.update_data(amount = message.text.strip())
+    dep_id, name, amount = await state.get_data()
+    await db_manager.change_deposit(dep_id, name, amount)
+    await bot.send_message(message.chat.id, 'изменено!')
+
+async def handle_change_deposit_name(message : Message, state : FSMContext, bot : Bot):
+    await state.update_data(name = message.text.strip())
+    await bot.send_message(message.chat.id, 'Введите сумму')
+    await state.set_state(ChangeDeposit.amount)
+
+async def handle_change_deposit_id(message : Message, state : FSMContext, bot : Bot):
+    await state.update_data(depId = message.text.strip())
+    await bot.send_message(message.chat.id, 'Введите название:')
+    await state.set_state(ChangeDeposit.name)
+
 
 async def handle_check_password_for_email(message: Message, state: FSMContext, bot: Bot, db_manager: DatabaseManager):
     await state.update_data(old_pas_input=message.text.strip())

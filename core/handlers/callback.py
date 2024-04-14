@@ -18,6 +18,21 @@ async def show_report(callback: CallbackQuery, bot : Bot, db_manager : DatabaseM
     keyboard_builder.button(text='↩️ В меню', callback_data='menu')
     await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text=f'Всего трат: {sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB\nСтоимость акций: {await db_manager.get_all_amount_share(callback.from_user.id)} RUB\nВсего заработано: {await db_manager.get_all_amount_salary(callback.from_user.id)} RUB\nБаланс: {await db_manager.get_all_amount_salary(callback.from_user.id) + await db_manager.get_all_amount_share(callback.from_user.id) - sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB', reply_markup=keyboard_builder.as_markup())
 
+async def change_deposit_start(callback : CallbackQuery, bot: Bot, state : FSMContext):
+    await callback.answer()
+    await bot.send_message(chat_id=callback.message.chat.id, text='Введите ID:')
+    await state.set_state(ChangeDeposit.depId)
+
+async def change_deposit(callback : CallbackQuery, bot : Bot, db_manager : DatabaseManager):
+    await callback.answer()
+    text = ''
+    for elem in await db_manager.get_all_salary(callback.from_user.id):
+        text += str(elem) + '\n'
+    
+    await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                message_id=callback.message.message_id,
+                                text=text,
+                                reply_markup=get_change_deposit_keyboard())
 
 async def handle_qr(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await callback.answer()
@@ -28,6 +43,14 @@ async def handle_deposite_money(callback: CallbackQuery, state: FSMContext, bot:
     await callback.answer()
     await bot.send_message(callback.message.chat.id, f"Введите комментарий по доходу:")
     await state.set_state(FormDepositeMpney.name)
+
+async def change_money_info(callback : CallbackQuery, bot : Bot):
+    await callback.answer()
+    await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                message_id=callback.message.message_id,
+                                text=f"「📂」 <b>Что хотите поменять?</b>",
+                                reply_markup=get_change_money_info_keyboard(),
+                                parse_mode=ParseMode.HTML)
 
 async def get_menu(callback: CallbackQuery, bot: Bot):
     await callback.answer()

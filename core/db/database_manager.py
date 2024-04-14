@@ -99,7 +99,14 @@ class DatabaseManager:
                 await cur.execute(query, (telegram_id,))
                 user = await cur.fetchone()
                 return dict(user) if user else None
-            
+    
+    async def change_deposit(self, dep_id, name, amount):
+        async with self.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    query = f"UPDATE ProfitableTransaction SET name = ?, amount = ? WHERE id = ?"
+                    await cur.execute(query, (str(name), str(amount), str(dep_id), ))
+                    
+    
     async def get_all_amount_salary(self, telegram_id : int) -> int:
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cur:
@@ -109,6 +116,14 @@ class DatabaseManager:
                     query = f"SELECT amount FROM ProfitableTransaction WHERE user_id = '{user_id[0]}'"
                     await cur.execute(query)
                     return sum([int(elem[0]) for elem in await cur.fetchall()])
+                
+    async def get_all_salary(self, telegram_id):
+        async with self.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    user_id = await self.get_user_by_telegram_id(telegram_id)
+                    query = f"SELECT id, name, amount, category, currency FROM ProfitableTransaction WHERE user_id = '{user_id['id']}'"
+                    await cur.execute(query)
+                    return await cur.fetchall()
 
     async def get_all_amount_share(self, telegram_id : int) -> int:
         async with self.pool.acquire() as conn:
@@ -137,6 +152,8 @@ class DatabaseManager:
                 query = f"SELECT amount FROM Transaction WHERE user_id = '{user_id[0]}'"
                 await cur.execute(query)
                 return [int(elem[0]) for elem in await cur.fetchall()]
+            
+            
     async def is_user_by_telegram_id(self, telegram_id: int) -> bool:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:

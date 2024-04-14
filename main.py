@@ -39,10 +39,12 @@ async def start():
     # callback
     dp.callback_query.register(show_report, F.data == "get_report")
     dp.callback_query.register(get_menu, F.data == "menu")
+    dp.callback_query.register(change_money_info, F.data == "change_money_info")
     dp.callback_query.register(start_login, F.data == "log_in")
     dp.callback_query.register(handle_get_data, F.data == "get_data")
     dp.callback_query.register(handle_add_transaction, F.data == "add_transaction")
     dp.callback_query.register(handle_qr, F.data == "send_QR")
+    dp.callback_query.register(change_deposit, F.data == "change_deposite")
     dp.callback_query.register(handle_deposite_money, F.data == "deposite_money")
     dp.callback_query.register(process_data_navigation, F.data.startswith("page_"))
 
@@ -50,6 +52,13 @@ async def start():
     dp.callback_query.register(handle_change_email, F.data == "change_email")
     dp.message.register(handle_check_password_for_email, ChangeEmail.check_old_password)
     dp.message.register(new_email, ChangeEmail.new_email)
+
+    #change deposit
+    dp.callback_query.register(change_deposit_start, F.data == "change_deposite_start")
+    dp.message.register(handle_change_deposit_id, ChangeDeposit.depId)
+    dp.message.register(handle_change_deposit_name, ChangeDeposit.name)
+    dp.message.register(handle_change_deposit_amount, ChangeDeposit.amount)
+    #
 
     # change username
     dp.callback_query.register(handle_change_nickname, F.data == 'change_nickname')

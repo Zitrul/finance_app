@@ -5,6 +5,10 @@ class FormLogin(StatesGroup):
     login = State()
     password = State()
 
+class ChangeDeposit(StatesGroup):
+    depId = State()
+    name = State()
+    amount = State()
 
 class FormTransaction(StatesGroup):
     name = State()
