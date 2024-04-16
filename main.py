@@ -9,7 +9,7 @@ from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
 from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_sort, auto_sort_vector, \
-    get_current_price, get_current_price_trend, get_times_candle, get_times_candle_m
+    get_current_price, get_current_price_trend, get_times_candle, get_times_candle_m, get_prediction
 from classes import stringa, Product
 
 first_time_tg = ""
@@ -203,6 +203,9 @@ def get_transactions_by_date_controller(user_id: str, datefrom: str):
     result = db.get_transactions_by_date(user_id, datefrom)
     db.commit()
     return result
+@app.get("/get_prediction_by_date")
+def get_prediction_controller( delta:str, ticker:str, days_to_predict:str):
+    return get_prediction(datetime.datetime.now(),int(delta),ticker, int(days_to_predict))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=3214)
