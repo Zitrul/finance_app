@@ -1,6 +1,8 @@
 import os
 import sqlite3
 from datetime import datetime, timedelta
+import numpy as np
+from sklearn.linear_model import LinearRegression
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import requests
@@ -10,7 +12,10 @@ from glob import glob
 import pandas as pd
 import DBmanager
 from classes import Product
-
+import plotly
+import plotly.graph_objs as go
+import plotly.express as px
+from plotly.subplots import make_subplots
 categories = ['Мясная гастрономия', 'Сладости и десерты', 'Сыры', 'Овощи и фрукты', 'Кулинария', 'Выпечка и хлеб',
               'Напитки', 'Замороженные полуфабрикаты', 'Товары для животных', 'Алкоголь', 'Косметика средства гигиены',
               'Молочные продукты', 'Мясо птица', 'Рыба и морепродукты', 'Детское питание', 'Техника', 'Ремонт',
@@ -261,3 +266,49 @@ def get_times_candle_m(date_start, delta, ticker):
     time = list(frame['end'])
     #print(time, prices, len(time), len(prices))
     return {"time": time, "prices": prices}
+def get_times_candle_prediction(date_start, delta, ticker):
+    date_end = (date_start - timedelta(days=delta)).strftime("%Y-%m-%d")
+    date_start = date_start.strftime("%Y-%m-%d")
+    j = requests.get(f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_start}&interval=24').json()
+    data = [{k : r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
+
+    frame = pd.DataFrame(data)
+    prices = list(frame['close'])
+    time = list(frame['end'])
+    time_number = list()
+    time_start= time[0]
+    date1 = datetime.strptime(time[0], '%Y-%m-%d %H:%M:%S')
+    day_max = 0
+    for date in time:
+
+        date2 = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+        delta = date2 - date1
+        day_max = delta.days
+        time_number.append(delta.days)
+    return {"time": time_number, "prices": prices, "time_date": time, "time_start":time_start, "day_max":day_max}
+def get_prediction(date_start, delta, ticker, days_to_predict):
+
+    x = get_times_candle_prediction(date_start, delta, ticker)
+    #print(x)
+    #Преобразование данных полученных от апи мос биржи
+    time_date = x["time_date"]
+    time_start = datetime.strptime(x["time_start"], '%Y-%m-%d %H:%M:%S')
+    prices_list = x["prices"]
+    day_max = x["day_max"]
+    time = np.array(x["time"]).reshape((-1, 1))
+    prices = np.array(x["prices"])
+    #задаю модель
+    model = LinearRegression()
+    model = model.fit(time, prices)
+    r_sq = model.score(time, prices)
+
+    #Пердсказываю на 30 дней вперед
+    for day_to_predict in range(day_max+1, day_max+days_to_predict):
+        prices_list.append(float(day_to_predict * model.coef_ + model.intercept_))
+        date_today = (time_start + timedelta(days=day_to_predict)).strftime('%Y-%m-%d %H:%M:%S')
+        time_date.append(date_today)
+    result = {}
+    for i in range(len(time_date)):
+        result[time_date[i]] = prices_list[i]
+    return result
+
