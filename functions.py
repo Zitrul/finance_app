@@ -16,19 +16,18 @@ import plotly
 import plotly.graph_objs as go
 import plotly.express as px
 from plotly.subplots import make_subplots
-categories = ['Мясная гастрономия', 'Сладости и десерты', 'Сыры', 'Овощи и фрукты', 'Кулинария', 'Выпечка и хлеб',
-              'Напитки', 'Замороженные полуфабрикаты', 'Товары для животных', 'Алкоголь', 'Косметика средства гигиены',
-              'Молочные продукты', 'Мясо птица', 'Рыба и морепродукты', 'Детское питание', 'Техника', 'Ремонт',
-              'Товары для дома', 'Авто', 'Канцтовары', 'Красота и здоровье', 'Досуг и хобби', 'Игрушки', 'Мебель',
-              'Детская одежда и обувь', 'Хозтовары', 'Зоотовары', 'Детям и мамам', 'Книги', 'Дача и сад', 'Бакалея', 'Колбаса и сосиски']
+from settings import categories
 
-def vector_compare(sentence1,sentences):
+
+def vector_compare(sentence1, sentences):
     vectorizer = TfidfVectorizer()
-    vector = vectorizer.fit_transform([sentence1]+list(sentences))
+    vector = vectorizer.fit_transform([sentence1] + list(sentences))
     vectors = vector.toarray()
     simular = cosine_similarity(vectors)
-    print(max(simular[0][1:])*100, sentences[simular[0].argmax()])
-    return max(simular[0][1:])*100
+    #print(max(simular[0][1:]) * 100, sentences[simular[0].argmax()])
+    #print(simular, sentences, sentence1)
+    return max(simular[0][1:]) * 100
+
 
 def compare(s1, s2):
     words1 = s1.lower().split()
@@ -46,7 +45,6 @@ def compare(s1, s2):
         count += list2.count(words)
     a = min(count / (max(len(list1), 1)), 1) * 100 * min(count / max(len(list2), 1), 1)
     return a
-
 
 
 def auto_sort_vector(products_to_check):
@@ -69,13 +67,14 @@ def auto_sort_vector(products_to_check):
             if row[0] != "0":
                 all_rows.append(row[0])
         for i in range(n):
-            check = vector_compare(products_to_check[i].name, all_rows)
-            if check > result[i] and check > 65:
-                result[i] = check
+            if len(all_rows) > 0:
+                check = vector_compare(products_to_check[i].name, all_rows)
+                if check > result[i] and check > 65:
+                    result[i] = check
 
-                products_to_check[i].category = category
+                    products_to_check[i].category = category
 
-        #if found_flag != 0:
+        # if found_flag != 0:
         #    break
 
     print(result)
@@ -84,6 +83,7 @@ def auto_sort_vector(products_to_check):
     conn.close()
 
     return products_to_check
+
 
 def auto_sort(products_to_check):
     conn = sqlite3.connect('products.db')
@@ -153,7 +153,7 @@ def CHECK_CHECKER(auto_change, user_id, file_location):
     product_list = dict()
     Product_List = []
     for i in data_s_cheka:
-        product = Product(name=i["name"], amount= i["price"] / 100 * i["quantity"],currency="RUB", category="Остальное")
+        product = Product(name=i["name"], amount=i["price"] / 100 * i["quantity"], currency="RUB", category="Остальное")
         Product_List.append(product)
     if auto_change:
         Product_List = auto_sort(Product_List)
@@ -163,7 +163,6 @@ def CHECK_CHECKER(auto_change, user_id, file_location):
     db.commit()
     return "QR code прочитан"
     # print(check_data["data"]["json"]["items"])
-
 
 
 def add_by_qr_info(auto_change, user_id, qr_data):
@@ -179,7 +178,7 @@ def add_by_qr_info(auto_change, user_id, qr_data):
     data_s_cheka = check_1["data"]["json"]["items"]
     Product_List = []
     for i in data_s_cheka:
-        product = Product(name=i["name"], amount= i["price"] / 100 * i["quantity"],currency="RUB", category="Остальное")
+        product = Product(name=i["name"], amount=i["price"] / 100 * i["quantity"], currency="RUB", category="Остальное")
         Product_List.append(product)
     if auto_change:
         Product_List = auto_sort(Product_List)
@@ -188,6 +187,8 @@ def add_by_qr_info(auto_change, user_id, qr_data):
     db.add_products(Product_List, user_id)
     db.commit()
     return "QR code прочитан"
+
+
 def get_history(ticket, date_start, date_end):
     result = dict()
     date_end_copy = date_end
@@ -200,7 +201,7 @@ def get_history(ticket, date_start, date_end):
         date_now = (date_start + timedelta(days=day)).strftime("%Y-%m-%d")
         url = f'https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/{ticket}/securities.json?from={date_now}&tradingsession=1'
         info = requests.get(url).json()
-        #print(info)
+        # print(info)
         data = info["history"]["data"]
         for inform in data:
             date1 = datetime.strptime(inform[1], "%Y-%m-%d")
@@ -213,6 +214,8 @@ def get_history(ticket, date_start, date_end):
         if f == 0:
             break
     return result
+
+
 def get_current_price(ticket, date_get):
     result = dict()
     url = f'https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/{ticket}/securities.json?from={date_get}'
@@ -231,6 +234,7 @@ def get_current_price(ticket, date_get):
         print(result)
         return result
 
+
 def get_current_price_trend(ticket, date_get):
     result1 = get_current_price(ticket, date_get)
 
@@ -239,71 +243,79 @@ def get_current_price_trend(ticket, date_get):
     result2 = get_current_price(ticket, date2.strftime('%Y-%m-%d'))
     print(result2)
     print(result1)
-    return {"trend":str(float(result1["price"]) -float(result2["price"]) )}
+    return {"trend": str(float(result1["price"]) - float(result2["price"]))}
+
+
 def get_times_candle(date_start, delta, ticker):
     date_end = (date_start - timedelta(days=delta)).strftime("%Y-%m-%d")
     date_start = date_start.strftime("%Y-%m-%d")
-    j = requests.get(f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_start}&interval=24').json()
-    data = [{k : r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
+    j = requests.get(
+        f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_start}&interval=24').json()
+    data = [{k: r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
 
     frame = pd.DataFrame(data)
     prices = list(frame['close'])
     time = list(frame['end'])
-    #print(time, prices, len(time), len(prices))
+    # print(time, prices, len(time), len(prices))
     return {"time": time, "prices": prices}
+
 
 def get_times_candle_m(date_start, delta, ticker):
     delta = 0
     if datetime.weekday(date_start) >= 5:
-        delta = datetime.weekday(date_start)-4
+        delta = datetime.weekday(date_start) - 4
     date_end = (date_start - timedelta(days=delta)).strftime("%Y-%m-%d")
 
-    j = requests.get(f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_end}&interval=1m').json()
-    data = [{k : r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
+    j = requests.get(
+        f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_end}&interval=1m').json()
+    data = [{k: r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
 
     frame = pd.DataFrame(data)
     prices = list(frame['close'])
     time = list(frame['end'])
-    #print(time, prices, len(time), len(prices))
+    # print(time, prices, len(time), len(prices))
     return {"time": time, "prices": prices}
+
+
 def get_times_candle_prediction(date_start, delta, ticker):
     date_end = (date_start - timedelta(days=delta)).strftime("%Y-%m-%d")
     date_start = date_start.strftime("%Y-%m-%d")
-    j = requests.get(f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_start}&interval=24').json()
-    data = [{k : r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
+    j = requests.get(
+        f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{ticker}/candles.json?from={date_end}&till={date_start}&interval=24').json()
+    data = [{k: r[i] for i, k in enumerate(j['candles']['columns'])} for r in j['candles']['data']]
 
     frame = pd.DataFrame(data)
     prices = list(frame['close'])
     time = list(frame['end'])
     time_number = list()
-    time_start= time[0]
+    time_start = time[0]
     date1 = datetime.strptime(time[0], '%Y-%m-%d %H:%M:%S')
     day_max = 0
     for date in time:
-
         date2 = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
         delta = date2 - date1
         day_max = delta.days
         time_number.append(delta.days)
-    return {"time": time_number, "prices": prices, "time_date": time, "time_start":time_start, "day_max":day_max}
-def get_prediction(date_start, delta, ticker, days_to_predict):
+    return {"time": time_number, "prices": prices, "time_date": time, "time_start": time_start, "day_max": day_max}
 
+
+def get_prediction(date_start, delta, ticker, days_to_predict):
     x = get_times_candle_prediction(date_start, delta, ticker)
-    #print(x)
-    #Преобразование данных полученных от апи мос биржи
+    # print(x)
+    # Преобразование данных полученных от апи мос биржи
     time_date = x["time_date"]
     time_start = datetime.strptime(x["time_start"], '%Y-%m-%d %H:%M:%S')
     prices_list = x["prices"]
     day_max = x["day_max"]
     time = np.array(x["time"]).reshape((-1, 1))
     prices = np.array(x["prices"])
-    #задаю модель
+    # задаю модель
     model = LinearRegression()
     model = model.fit(time, prices)
     r_sq = model.score(time, prices)
 
-    #Пердсказываю на 30 дней вперед
-    for day_to_predict in range(day_max+1, day_max+days_to_predict):
+    # Пердсказываю на 30 дней вперед
+    for day_to_predict in range(day_max + 1, day_max + days_to_predict):
         prices_list.append(float(day_to_predict * model.coef_ + model.intercept_))
         date_today = (time_start + timedelta(days=day_to_predict)).strftime('%Y-%m-%d %H:%M:%S')
         time_date.append(date_today)
@@ -311,4 +323,3 @@ def get_prediction(date_start, delta, ticker, days_to_predict):
     for i in range(len(time_date)):
         result[time_date[i]] = prices_list[i]
     return result
-

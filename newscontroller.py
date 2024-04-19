@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup as BS
 import time
 #from special_info import comp as companies
 import DBmanager
-
-
 def read_news(url,time):
     desc = ""
     company = ""
@@ -63,6 +61,5 @@ def check_news():
         #for i in range(len(spisok)):
         #   read_news(spisok[i], spisok_time[i])
         #time.sleep(120)
-#check_company()
-
-check_news()
+if __name__ == "__main__":
+    check_news()
