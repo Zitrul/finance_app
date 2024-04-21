@@ -5,40 +5,49 @@ const router = express.Router();
 const db = require("../models");
 const mid = require("../middlewares");
 const axios = require("axios");
-const yahooFinance = require("yahoo-finance2").default; // NOTE the .default
 
 router.post("/add-stocks", mid.authenticate, async (req, res) => {
-    try {
-        const ticker = req.body.ticker;
-        const amount = req.body.amount;
-        const user_id = req.user["id"];
-        const news_sub = req.body.news_sub;
+    const user_id = req.user["id"];
+    const company_name = req.body.company || 0;
+    const asset_amount = req.body.amount;
+    const stock_quote = req.body.ticker;
+    const news_subscription = req.body.news_sub || false;
 
-        const stockFound = await db.UserAssets.findOne({
-            where: sequelize.and({ user_id: user_id }, { stock_quote: ticker }),
-        });
-
-        if (stockFound) {
-            stockFound.asset_amount += amount;
-            await stockFound.save();
-        } else {
-            const stock_info = await yahooFinance.quote(ticker);
-            const company_name = stock_info["shortName"];
-
-            await db.UserAssets.create({
+    await axios
+        .post(`http://${process.env.API_IP}:3214/add_user_assets`, null, {
+            params: {
                 user_id: user_id,
                 company_name: company_name,
-                asset_amount: amount,
-                news_subscription: news_sub,
-                stock_quote: ticker,
-            });
-        }
+                asset_amount: asset_amount,
+                stock_quote: stock_quote,
+                news_subscription: news_subscription,
+            },
+        })
+        .then((response) => {
+            res.status(200).json(response.data);
+        })
+        .catch((error) => {
+            console.error(error.response.data.detail);
+            res.status(500).json("smth went wrong");
+        });
+});
 
-        res.status(200).json("succeeded");
-    } catch (err) {
-        console.log(err);
-        res.status(500).json("smth went wrong");
-    }
+router.get("/stock-trend", async (req, res) => {
+    const ticker = req.body.ticker;
+
+    axios
+        .get(`http://${process.env.API_IP}:3214/get_current_price_trend`, {
+            params: {
+                ticker: ticker,
+            },
+        })
+        .then((response) => {
+            res.status(200).json(response.data);
+        })
+        .catch((error) => {
+            console.error(error.response.data.detail);
+            res.status(500).json("smth went wrong");
+        });
 });
 
 router.get("/users-stocks", mid.authenticate, async (req, res) => {
