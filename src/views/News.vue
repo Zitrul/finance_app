@@ -9,6 +9,8 @@
                     <v-col cols="12">
                         <v-row class="d-flex flex-row justify-space-between align-center">
                             <p :class="{'text-h4': smAndUp, 'text-h5': xs, 'text-text_title': true}">Новости из мира финансов</p>
+                            <v-spacer></v-spacer>
+                            <v-text-field label="Поиск по компаниям" variant="underlined" prepend-icon="mdi-magnify" class="mr-5"></v-text-field>
                             <v-btn variant="outlined" :class="{'mt-2': xs}" @click="loading_content = true; fetch_news();">
                                 <font-awesome-icon :icon="['fas', 'rotate-right']" />
                                 <p class="pl-2">Обновить</p>
