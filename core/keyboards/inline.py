@@ -6,6 +6,13 @@ def get_log_in_keyboard():
     keyboard_builder.button(text="Войти по логину / паролю", callback_data="log_in")
     return keyboard_builder.as_markup()
 
+def get_change_transaction_keyboard():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text='Изменить', callback_data='change_transaction_start')
+    keyboard_builder.button(text="↩️ Назад", callback_data="menu")
+    return keyboard_builder.adjust(1, 1).as_markup()
+
+
 def get_change_deposit_keyboard():
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text="Изменить", callback_data='change_deposite_start')

@@ -9,6 +9,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.types import Message
 
+from core.keyboards.inline import *
 from core.db.database_manager import DatabaseManager
 from core.forms.forms import *
 from core.keyboards.inline import get_log_in_keyboard, get_main_menu_keyboard
@@ -144,10 +145,41 @@ async def new_email(message: Message, state: FSMContext, bot: Bot, db_manager: D
 
 async def handle_change_deposit_amount(message : Message, state : FSMContext, bot : Bot, db_manager : DatabaseManager):
     await state.update_data(amount = message.text.strip())
-    dep_id, name, amount = await state.get_data()
+    state_deposit = await state.get_data()
+    dep_id, name, amount = state_deposit['depId'], state_deposit['name'], state_deposit['amount']
+    await state.clear()
     await db_manager.change_deposit(dep_id, name, amount)
-    await bot.send_message(message.chat.id, 'изменено!')
+    text = '「✅」 Изменено успешно!\n'
+    for elem in await db_manager.get_all_salary(message.from_user.id):
+        text += str(elem) + '\n'
+        
+    await bot.send_message(message.chat.id, text=text, reply_markup=get_change_deposit_keyboard())
 
+async def handle_change_transaction_category(message : Message, state :FSMContext, bot : Bot, db_manager : DatabaseManager):
+    await state.update_data(category = message.text.split())
+    state_trn = await state.get_data()
+    await state.clear()
+    trn_id, name, amount, category = state_trn['trnId'], state_trn['name'], state_trn['amount'], state_trn['category']
+    await db_manager.change_transaction(trn_id, name, amount, category)
+    await bot.send_message(message.chat.id, text='「✅」 Изменено успешно!', reply_markup=get_change_transaction_keyboard())
+
+async def handle_change_transaction_amount(message : Message, state :FSMContext, bot : Bot):
+    await state.update_data(amount = message.text.split())
+    await bot.send_message(message.chat.id, 'Введите категорию:')
+    await state.set_state(ChangeTransaction.category)
+
+async def handle_change_transaction_name(message : Message, state :FSMContext, bot : Bot):
+    await state.update_data(name = message.text.split())
+    await bot.send_message(message.chat.id, 'Введите сумму:')
+    await state.set_state(ChangeTransaction.amount)
+
+
+async def handle_change_transaction_id(message : Message, state :FSMContext, bot : Bot):
+    await state.update_data(trnId = message.text.strip())
+    await bot.send_message(message.chat.id, 'Введите название:')
+    await state.set_state(ChangeTransaction.name)
+    
+    
 async def handle_change_deposit_name(message : Message, state : FSMContext, bot : Bot):
     await state.update_data(name = message.text.strip())
     await bot.send_message(message.chat.id, 'Введите сумму')

@@ -100,11 +100,17 @@ class DatabaseManager:
                 user = await cur.fetchone()
                 return dict(user) if user else None
 
+    async def change_transaction(self, trn_id, name, amount, category):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                query = "UPDATE Transaction SET name = %s, amount = %s, category = %s WHERE id = %s"
+                await cur.execute(query, (name, amount, category, trn_id))
+
     async def change_deposit(self, dep_id, name, amount):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                query = f"UPDATE ProfitableTransaction SET name = '{name}', amount = '{amount}' WHERE id = '{dep_id}'"
-                await cur.execute(query)
+                query = "UPDATE ProfitableTransaction SET name = %s, amount = %s WHERE id = %s"
+                await cur.execute(query, (name, amount, dep_id))
                     
     
     async def get_all_amount_salary(self, telegram_id : int) -> int:

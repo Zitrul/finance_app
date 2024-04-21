@@ -24,10 +24,26 @@ async def show_report(callback: CallbackQuery, bot : Bot, db_manager : DatabaseM
     keyboard_builder.button(text='↩️ В меню', callback_data='menu')
     await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text=f'Всего трат: {sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB\nСтоимость акций: {await db_manager.get_all_amount_share(callback.from_user.id)} RUB\nВсего заработано: {await db_manager.get_all_amount_salary(callback.from_user.id)} RUB\nБаланс: {await db_manager.get_all_amount_salary(callback.from_user.id) + await db_manager.get_all_amount_share(callback.from_user.id) - sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB', reply_markup=keyboard_builder.as_markup())
 
+async def handle_start_change_transaction(callback : CallbackQuery, bot : Bot, state : FSMContext):
+    await callback.answer()
+    await bot.send_message(chat_id=callback.message.chat.id, text='Введите ID:')
+    await state.set_state(ChangeTransaction.trnId)
+
 async def change_deposit_start(callback : CallbackQuery, bot: Bot, state : FSMContext):
     await callback.answer()
     await bot.send_message(chat_id=callback.message.chat.id, text='Введите ID:')
     await state.set_state(ChangeDeposit.depId)
+
+async def change_transaction(callback : CallbackQuery, bot : Bot, db_manager : DatabaseManager):
+    await callback.answer()
+    text = '////'
+    # for elem in await db_manager.get_transactions(callback.from_user.id):
+    #     text += str(elem) + '\n'
+    #print(text)
+    await bot.edit_message_text(chat_id=callback.message.chat.id,
+                                text = text,
+                                message_id=callback.message.message_id,
+                                reply_markup=get_change_transaction_keyboard())
 
 async def change_deposit(callback : CallbackQuery, bot : Bot, db_manager : DatabaseManager):
     await callback.answer()

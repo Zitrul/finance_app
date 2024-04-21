@@ -48,12 +48,20 @@ async def start():
     dp.callback_query.register(handle_deposite_money, F.data == "deposite_money")
     dp.callback_query.register(process_data_navigation, F.data.startswith("page_"))
     dp.callback_query.register(handle_show_visuals, F.data == 'get_visuals')
+    dp.callback_query.register(change_transaction, F.data == "change_transaction")
 
     # change email
     dp.callback_query.register(handle_change_email, F.data == "change_email")
     dp.message.register(handle_check_password_for_email, ChangeEmail.check_old_password)
     dp.message.register(new_email, ChangeEmail.new_email)
 
+    #change transaction
+    dp.callback_query.register(handle_start_change_transaction, F.data == 'change_transaction_start')
+    dp.message.register(handle_change_transaction_id, ChangeTransaction.trnId)
+    dp.message.register(handle_change_transaction_name, ChangeTransaction.name)
+    dp.message.register(handle_change_transaction_amount, ChangeTransaction.amount)
+    dp.message.register(handle_change_transaction_category, ChangeTransaction.category)
+    
     #change deposit
     dp.callback_query.register(change_deposit_start, F.data == "change_deposite_start")
     dp.message.register(handle_change_deposit_id, ChangeDeposit.depId)
