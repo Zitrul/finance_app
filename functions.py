@@ -220,13 +220,17 @@ def get_current_price(ticket, date_get):
     result = dict()
     url = f'https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/{ticket}/securities.json?from={date_get}'
     info = requests.get(url).json()
+    print(info)
     data = info["history"]["data"]
     print(data)
     for inform in data:
+        print(inform[1], inform[11])
         date1 = datetime.strptime(inform[1], "%Y-%m-%d")
         if date1 <= datetime.strptime(date_get, "%Y-%m-%d"):
-            result["price"] = inform[6]
+
+            result["price"] = inform[11]
             result['date'] = inform[1]
+
     if result == {}:
         new_date = datetime.strptime(date_get, "%Y-%m-%d") - timedelta(days=1)
         return get_current_price(ticket, new_date.strftime('%Y-%m-%d'))

@@ -66,6 +66,7 @@ class DBmanager:
         return companies
 
     def add_users_asset(self, company_name,news_subscription, user_id, asset_amount,stock_quote, asset_buy_price):
+        print(asset_amount, asset_buy_price)
         if news_subscription == "true":
             news_subscription = 1
         elif news_subscription == "True":

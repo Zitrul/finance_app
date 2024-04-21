@@ -52,7 +52,7 @@ def add_user_assets(user_id: str, company_name: str, asset_amount: str, news_sub
     return {"OK": "OK"}
 
 @app.get("/get_qr_info")
-def add_user_assets(user_id: str, qr_data: str, auto_sort: str):
+def get_qr_info(user_id: str, qr_data: str, auto_sort: str):
     response = add_by_qr_info(auto_change=auto_sort, user_id=int(user_id), qr_data=qr_data)
     return {"info": response}
 
