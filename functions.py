@@ -247,7 +247,7 @@ def get_current_price_trend(ticket, date_get):
     result2 = get_current_price(ticket, date2.strftime('%Y-%m-%d'))
     print(result2)
     print(result1)
-    return {"trend": str(float(result1["price"]) - float(result2["price"]))}
+    return {"trend": str(round(float(result1["price"]) - float(result2["price"]), 2))}
 
 
 def get_times_candle(date_start, delta, ticker):
