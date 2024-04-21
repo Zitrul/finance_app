@@ -141,7 +141,7 @@ async def sell_shares_amount(message: Message, state: FSMContext, bot: Bot, db_m
                     status=True
     if status:
         await bot.send_message(message.chat.id, f"「✅」 Акции успешно проданы!\n "
-                                                f"Пибыль состваила:{(cost_now['price']*amount)-were_bougt['sell_on_price']}", reply_markup=get_return_keyboard())
+                                                f"Прибыль состваила:{(cost_now['price']*amount)-were_bougt['sell_on_price']}", reply_markup=get_return_keyboard())
     else:
         await bot.send_message(message.chat.id, 'Ошибка! Попробуйте еще раз!')
 

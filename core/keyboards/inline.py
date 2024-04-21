@@ -36,7 +36,7 @@ def get_main_menu_keyboard():
     keyboard_builder.button(text="✏ Затраты / Доходы", callback_data="change_money_info")
     keyboard_builder.button(text='📄 Отчет', callback_data='get_report')
     keyboard_builder.button(text='📈 График трат', callback_data='get_visuals')
-    keyboard_builder.button(text='💸 Подать акции', callback_data='sell_shares')
+    keyboard_builder.button(text='💸 Продать акции', callback_data='sell_shares')
     return keyboard_builder.adjust(2, repeat=True).as_markup()
 
 
