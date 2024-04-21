@@ -20,13 +20,14 @@ function open(req, res, next) {
             }
 
             // Проверяем действительность refresh token
-            jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
-                if (err || !(await auth.checkRefreshToken(user.user_id, refreshToken, db) ) ) {
+            jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user2) => {
+                console.log(user2);
+                if (err || !(await auth.checkRefreshToken(user2.id, refreshToken, db) ) ) {
                     return res.sendStatus(403); // Недействительный refresh token
                 }
                 // Генерируем новый access token и продолжаем выполнение запроса
-                const newAccessToken = auth.generateAccessToken(user);
-                req.user = await db.User.findOne({ where: { id: user.user_id } });
+                const newAccessToken = auth.generateAccessToken(user2);
+                req.user = await db.User.findOne({ where: { id: user2.id } });
                 res.cookie("accessToken", newAccessToken);
                 next();
             });
