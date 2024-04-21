@@ -46,6 +46,7 @@ async def start():
     dp.callback_query.register(handle_qr, F.data == "send_QR")
     dp.callback_query.register(change_deposit, F.data == "change_deposite")
     dp.callback_query.register(handle_deposite_money, F.data == "deposite_money")
+    dp.callback_query.register(handle_sell_shares, F.data == "sell_shares")
     dp.callback_query.register(process_data_navigation, F.data.startswith("page_"))
     dp.callback_query.register(handle_show_visuals, F.data == 'get_visuals')
     dp.callback_query.register(change_transaction, F.data == "change_transaction")
@@ -86,6 +87,8 @@ async def start():
     dp.message.register(do_file_qr, FormQR.qr)
     dp.message.register(deposite_money_name, FormDepositeMpney.name)
     dp.message.register(deposite_money_sum, FormDepositeMpney.sum)
+    dp.message.register(sell_shares_ticker, FormSellShares.ticker)
+    dp.message.register(sell_shares_amount, FormSellShares.amount)
 
     try:
         await dp.start_polling(bot)

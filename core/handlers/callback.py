@@ -66,6 +66,11 @@ async def handle_deposite_money(callback: CallbackQuery, state: FSMContext, bot:
     await bot.send_message(callback.message.chat.id, f"Введите комментарий по доходу:")
     await state.set_state(FormDepositeMpney.name)
 
+async def handle_sell_shares(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await callback.answer()
+    await bot.send_message(callback.message.chat.id, f"Введите название акций:")
+    await state.set_state(FormSellShares.ticker)
+
 async def change_money_info(callback : CallbackQuery, bot : Bot):
     await callback.answer()
     await bot.edit_message_text(chat_id=callback.message.chat.id,

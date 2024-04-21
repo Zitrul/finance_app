@@ -88,8 +88,8 @@ async def deposite_money_sum(message: Message, state: FSMContext, bot: Bot, db_m
 
     data = await state.get_data()
 
-    api_request = f"http://{HOST}:{PORT_API}/add_profit_transaction?user_id={user_id}&" \
-                  f"name={data['name']}&category=Работа&amount={money}"
+    api_request = f"http://{HOST}:{PORT_API}/add_profit_transaction?user_id={user_id}&name={data['name']}" \
+                  f"&category=Много денег&amount={money}"
 
     async with aiohttp.ClientSession() as session:
         async with session.post(api_request) as resp:
@@ -102,6 +102,50 @@ async def deposite_money_sum(message: Message, state: FSMContext, bot: Bot, db_m
         await bot.send_message(message.chat.id, 'Ошибка! Попробуйте еще раз!')
     await state.clear()
 
+async def sell_shares_ticker(message: Message, state: FSMContext, bot: Bot, db_manager: DatabaseManager):
+    await state.update_data(ticker=message.text)
+    await bot.send_message(message.chat.id, "Введите количество акций:")
+    await state.set_state(FormSellShares.amount)
+
+async def sell_shares_amount(message: Message, state: FSMContext, bot: Bot, db_manager: DatabaseManager):
+    try:
+        amount = int(message.text)
+    except:
+        await state.clear()
+        await bot.send_message(message.chat.id, "Вы ввели неправильные данные")
+        return
+
+    user_id = await db_manager.get_user_by_telegram_id(message.from_user.id)
+    user_id = user_id['id']
+
+    data = await state.get_data()
+
+    api_request1 = f"http://{HOST}:{PORT_API}/modify_user_assets?user_id={user_id}&ticker={data['ticker']}&asset_amount={amount}"
+
+    api_request2 = f"http://{HOST}:{PORT_API}/get_current_price?ticker={data['ticker']}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(api_request1) as resp:
+            were_bougt = json.loads(await resp.text())
+        async with session.get(api_request2) as resp:
+            cost_now = json.loads(await resp.text())
+    print(were_bougt, cost_now)
+    status=False
+
+    if were_bougt['success']:
+        api_request = f"http://{HOST}:{PORT_API}/add_profit_transaction?user_id={user_id}&name=доход по акциям {data['ticker']}" \
+                      f"&category=акции&amount={(cost_now['price']*amount)-were_bougt['sell_on_price']}"
+        async with aiohttp.ClientSession() as session:
+            async with session.post(api_request) as resp:
+                if json.loads(await resp.text())['OK'] == 'OK':
+                    status=True
+    if status:
+        await bot.send_message(message.chat.id, f"「✅」 Акции успешно проданы!\n "
+                                                f"Пибыль состваила:{(cost_now['price']*amount)-were_bougt['sell_on_price']}", reply_markup=get_return_keyboard())
+    else:
+        await bot.send_message(message.chat.id, 'Ошибка! Попробуйте еще раз!')
+
+    await state.clear()
 
 
 async def set_login(message: Message, state: FSMContext, bot: Bot):

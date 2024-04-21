@@ -29,8 +29,12 @@ class FormQR(StatesGroup):
     qr = State()
 
 class FormDepositeMpney(StatesGroup):
-    name=State()
+    name = State()
     sum = State()
+
+class FormSellShares(StatesGroup):
+    ticker = State()
+    amount = State()
 
 class ChangeNickname(StatesGroup):
     new_nickname = State()
