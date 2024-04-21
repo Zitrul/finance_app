@@ -10,7 +10,7 @@
                         <v-row class="d-flex flex-row justify-space-between align-center">
                             <p :class="{'text-h4': smAndUp, 'text-h5': xs, 'text-text_title': true}">Новости из мира финансов</p>
                             <v-spacer></v-spacer>
-                            <v-text-field label="Поиск по компаниям" variant="underlined" prepend-icon="mdi-magnify" class="mr-5"></v-text-field>
+                            <v-text-field label="Поиск по компаниям" variant="underlined" prepend-icon="mdi-magnify" class="mr-5" v-model="search_field" @change="find_news()"></v-text-field>
                             <v-btn variant="outlined" :class="{'mt-2': xs}" @click="loading_content = true; fetch_news();">
                                 <font-awesome-icon :icon="['fas', 'rotate-right']" />
                                 <p class="pl-2">Обновить</p>
@@ -84,9 +84,11 @@ export default {
   data() {
     return {
         news: [],
+        searched_news: [],
         news_page: 1,
         news_pro_page: 10,
         loading_content: true,
+        search_field: "",
     };
   },
   methods: {
@@ -97,6 +99,7 @@ export default {
         }).then((response) => {
             if(response.status == 200) {
                 this.news = response.data;
+                this.searched_news = response.data;
                 this.loading_content = false;
             }
             else{
@@ -107,10 +110,15 @@ export default {
             fun.show('Произошла неизвестная ошибка');
         });
     },
+    find_news(){
+        this.searched_news = this.news.filter((val) => {
+            return val.company_name.toLowerCase().includes(this.search_field.toLowerCase());
+        });
+    }
   },
   computed: {
     current_news_list() {
-        return this.news.slice(this.news_pro_page * (this.news_page - 1), this.news_pro_page * (this.news_page));
+        return this.searched_news.slice(this.news_pro_page * (this.news_page - 1), this.news_pro_page * (this.news_page));
     }
   },
   mounted() {

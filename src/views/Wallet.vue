@@ -1,6 +1,6 @@
 <template>
     <ContentWrapper>
-        <v-row>
+        <v-row cols="12">
             <v-col cols="1" v-if="lgAndUp">
             </v-col>
 
@@ -73,6 +73,102 @@
             <v-col :cols="smAndDown ? 12 : (lgAndUp ? 3 : 5)">
                 <v-card>
                     <p class="text-h4 text-text_title">Список транзакций</p>
+                    <v-list>
+                        <v-list-item
+                            v-for="val in current_transactions_list"
+                            :key="val.id"
+                            :subtitle="val.category"
+                            
+                            class="pa-2"
+                        >
+                            <div class="d-flex flex-row justify-space-between">
+                                <p class="text-primary font-weight-medium">{{ val.amount }} ₽</p>
+                                <p class="font-weight-medium">{{ val.name }}</p>
+                                <p>{{ fun.format_current_date(val.created_at) }}</p>
+                                <v-btn icon="mdi-pencil" density="comfortable" variant="text" @click="open_edit_form(val.id);"></v-btn>
+                            </div>
+                        </v-list-item>
+                    </v-list>
+                    <div class="text-center">
+                        <v-pagination
+                        v-model="transaction_page"
+                        fluid
+                        :length="Math.floor(transactions.length / transactions_pro_page) + (transactions.length % transactions_pro_page == 0 ? 0 : 1)"
+                        ></v-pagination>
+                    </div>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <v-row cols="12" class="mt-5">
+            <v-col cols="1" v-if="lgAndUp">
+            </v-col>
+
+            <v-col :cols="mdAndDown ? 12 : 7">
+                <v-row>
+                    <v-col cols="12">
+                        <v-row>
+                            <p class="text-h4 text-text_title">Внести прибыль</p>
+                        </v-row>
+                        <v-row fluid>
+                            <v-btn size="x-large" :class="{'ma-3' : smAndUp}" @click="income_transactin_form_opened = true">
+                                <v-icon icon="mdi-file-edit-outline"></v-icon>
+                                <p class="ml-2">Внести вручную</p>
+                            </v-btn>
+                        </v-row>
+                    </v-col>
+                    <v-col>
+                        
+                    </v-col>
+                </v-row>
+                <div class="mt-3">
+                    <v-row>
+                        <p class="text-h4 text-text_title">Ваши пополнения</p>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <div class="mt-3"></div>
+                            <v-row>
+                                <v-menu v-model="menuOpen">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                        color="primary"
+                                        v-bind="props"
+                                        >
+                                        {{ periods[period_selected].title }} <font-awesome-icon :icon="['fas', menuOpen ? 'angle-up' : 'angle-down']" class="ml-2"/>
+                                        </v-btn>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item
+                                        v-for="(item, index) in periods"
+                                        :key="index"
+                                        :value="index"
+                                        @click="change_period(index)"
+                                        >
+                                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                                
+                                <div class="d-flex flex-row ma-0 ml-5">
+                                    <v-btn variant="plain" @click="change_income_chart('line')" title="Линейный график"><font-awesome-icon :icon="['fas', 'chart-line']"/></v-btn>
+                                    <v-btn variant="plain" @click="change_income_chart('pie')" title="График-пирог"><font-awesome-icon :icon="['fas', 'chart-pie']" /></v-btn>
+                                    <v-btn variant="plain" @click="change_income_chart('bar')" title="Столбцовый график"><font-awesome-icon :icon="['fas', 'chart-simple']" /></v-btn>
+                                </div>
+                            </v-row>
+                            <v-row>
+                                <div class="chart_container mt-7">
+                                    <canvas id="income_chart"></canvas>
+                                </div>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                </div>
+            </v-col>
+
+            <v-col :cols="smAndDown ? 12 : (lgAndUp ? 3 : 5)">
+                <v-card>
+                    <p class="text-h4 text-text_title">Список получек</p>
                     <v-list>
                         <v-list-item
                             v-for="val in current_transactions_list"
@@ -196,6 +292,7 @@ export default {
         category: '',
       },
       edit_transaction_form_opened: false,
+      income_transactin_form_opened: false,
     };
   },
   methods: {

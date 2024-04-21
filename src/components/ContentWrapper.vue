@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <v-main fluid>
-            <v-container fluid :class="{'ml-16': lgAndUp, 'pl-10': smAndDown, 'pl-16': mdAndUp, 'ml-2': mdAndDown && smAndUp, 'd-flex': true, 'justify-center': true}">
+            <v-container fluid :class="{'ml-16': lgAndUp, 'pl-10': smAndDown, 'pl-16': mdAndUp, 'ml-2': mdAndDown && smAndUp, 'd-flex': true, 'justify-center': true, 'flex-wrap': true}">
                 <slot></slot>
             </v-container>
         </v-main>

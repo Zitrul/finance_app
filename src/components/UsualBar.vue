@@ -90,7 +90,8 @@
                     <p>Email</p>
                     <v-text-field v-model="account.email" density="compact"></v-text-field>
 
-                    <v-btn variant="text" block color="red-darken-2" append-icon="mdi-logout-variant" density="compact">Выйти из аккаунта</v-btn>
+                    <v-btn variant="text" block color="red-darken-2" append-icon="mdi-logout-variant" density="compact" @click="logout()">Выйти из аккаунта</v-btn>
+                    <!-- <v-btn variant="text" block color="red-darken-2" append-icon="mdi-logout-variant" density="compact" @click="logout">Выйти из аккаунта на всех устройствах</v-btn> -->
                 </v-card-text>
                 <template v-slot:actions>
 
@@ -161,6 +162,12 @@ export default {
                 this.account_opened = false;
             });
         },
+        logout(){
+            this.$cookies.keys().forEach(cookie => {
+                this.$cookies.remove(cookie);
+            })
+            this.$router.push('/');
+        }
     },
     computed: {
         current_route() {
