@@ -27,9 +27,10 @@ class DBmanager:
         return "OK"
     def add_p_transactions(self, user_id, amount, t_type, name):
 
-        sql = "INSERT INTO ProfitableTransaction (name, type, amount, currency, user_id, created_at) VALUES (%s,%s, %s, %s, %s, %s)"
+        sql = "INSERT INTO ProfitableTransaction (name, category, amount, currency, user_id, created_at, updated_at) VALUES (%s,%s, %s, %s, %s, %s, %s)"
         val = (str(name), str(t_type), str(amount), str('RUB'), user_id,
-                datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+                datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+                   datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
         self.cur.execute(sql, val)
 
         return "OK"
