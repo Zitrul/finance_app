@@ -1,3 +1,4 @@
+import json
 import os
 import sqlite3
 from datetime import datetime, timedelta
@@ -327,3 +328,9 @@ def get_prediction(date_start, delta, ticker, days_to_predict):
     for i in range(len(time_date)):
         result[time_date[i]] = prices_list[i]
     return result
+def get_company_name(ticker):
+    json_string = open("companies.json", "r").read()
+    dict_obj = json.loads(json_string)
+    if ticker in dict_obj:
+        return dict_obj[ticker]
+    return "None"

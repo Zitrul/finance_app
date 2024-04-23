@@ -9,7 +9,7 @@ from io import BytesIO
 from PIL import Image
 from DBmanager import DBmanager
 from functions import compare, CHECK_CHECKER, add_by_qr_info, get_history, auto_sort, auto_sort_vector, \
-    get_current_price, get_current_price_trend, get_times_candle, get_times_candle_m, get_prediction
+    get_current_price, get_current_price_trend, get_times_candle, get_times_candle_m, get_prediction, get_company_name
 from classes import stringa, Product
 app = FastAPI()
 
@@ -46,6 +46,10 @@ def add_user_assets(user_id: str, company_name: str, asset_amount: str, news_sub
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
     result = get_current_price(ticket=stock_quote, date_get=current_date)
     asset_buy_price = result["price"]
+    company_name = get_company_name(stock_quote)
+    print(company_name)
+    if company_name == "None":
+        news_subscription = "false"
     db = DBmanager()
     db.add_users_asset(company_name, news_subscription, user_id, asset_amount, stock_quote, asset_buy_price)
     db.commit()
