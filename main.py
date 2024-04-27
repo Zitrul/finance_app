@@ -63,6 +63,11 @@ async def start():
     dp.message.register(handle_change_transaction_amount, ChangeTransaction.amount)
     dp.message.register(handle_change_transaction_category, ChangeTransaction.category)
     
+    #delete_share
+    dp.callback_query.register(handle_delete_share, F.data == "delete_share")
+    dp.callback_query.register(delete_share_start, F.data == "delete_share_start")
+    dp.message.register(handle_share_delete, DeleteShare.share_id)
+    
     #change deposit
     dp.callback_query.register(change_deposit_start, F.data == "change_deposite_start")
     dp.message.register(handle_change_deposit_id, ChangeDeposit.depId)

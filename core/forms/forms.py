@@ -11,6 +11,8 @@ class ChangeTransaction(StatesGroup):
     amount = State()
     category = State()
 
+class DeleteShare(StatesGroup):
+    share_id = State()
     
 class ChangeDeposit(StatesGroup):
     depId = State()

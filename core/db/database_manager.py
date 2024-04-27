@@ -100,6 +100,16 @@ class DatabaseManager:
                 user = await cur.fetchone()
                 return dict(user) if user else None
 
+    async def get_all_share(self, user_id):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                user_id = await self.get_user_by_telegram_id(user_id)
+                user_id = user_id['id']
+                query = 'SELECT id, stock_quote, asset_amount, asset_buy_price, company_name FROM UserAssets WHERE user_id = %s'
+                await cur.execute(query, (user_id, ))
+                res = await cur.fetchall()
+                return [i for i in res]
+
     async def change_transaction(self, trn_id, name, amount, category):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
@@ -112,6 +122,11 @@ class DatabaseManager:
                 query = "UPDATE ProfitableTransaction SET name = %s, amount = %s WHERE id = %s"
                 await cur.execute(query, (name, amount, dep_id))
                     
+    async def delete_share_by_id(self, id):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                query = f'DELETE FROM UserAssets WHERE id = {id}'
+                await cur.execute(query)
     
     async def get_all_amount_salary(self, telegram_id : int) -> int:
             async with self.pool.acquire() as conn:

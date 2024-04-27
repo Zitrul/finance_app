@@ -37,8 +37,15 @@ def get_main_menu_keyboard():
     keyboard_builder.button(text='📄 Отчет', callback_data='get_report')
     keyboard_builder.button(text='📈 График трат', callback_data='get_visuals')
     keyboard_builder.button(text='💸 Продать акции', callback_data='sell_shares')
+    keyboard_builder.button(text='🗑 Удалить акцию', callback_data='delete_share')
     return keyboard_builder.adjust(2, repeat=True).as_markup()
 
+
+def get_delete_share_keyborad():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text='🗑 Удалить', callback_data='delete_share_start')
+    keyboard_builder.button(text='↩️ Назад', callback_data='menu')
+    return keyboard_builder.adjust(1, repeat=True).as_markup()
 
 def get_about_menu_keyboard():
     keyboard_builder = InlineKeyboardBuilder()

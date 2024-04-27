@@ -162,6 +162,13 @@ async def new_nickname(message: Message, state: FSMContext, bot: Bot, db_manager
     await state.clear()
 
 
+async def handle_share_delete(message : Message, bot : Bot, db_manager : DatabaseManager, state : FSMContext):
+    await state.update_data(share_id=message.text.strip())
+    data = await state.get_data()
+    await db_manager.delete_share_by_id(data['share_id'])
+    await bot.send_message(text = 'Удалено!', chat_id=message.chat.id)
+    await state.clear()
+
 async def new_password(message: Message, state: FSMContext, bot: Bot, db_manager: DatabaseManager):
     await state.update_data(new_password=message.text.strip())
     bc_salt = bcrypt.gensalt()

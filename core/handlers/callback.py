@@ -24,6 +24,19 @@ async def show_report(callback: CallbackQuery, bot : Bot, db_manager : DatabaseM
     keyboard_builder.button(text='↩️ В меню', callback_data='menu')
     await bot.edit_message_text(chat_id=callback.message.chat.id, message_id=callback.message.message_id, text=f'Всего трат: {sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB\nСтоимость акций: {await db_manager.get_all_amount_share(callback.from_user.id)} RUB\nВсего заработано: {await db_manager.get_all_amount_salary(callback.from_user.id)} RUB\nБаланс: {await db_manager.get_all_amount_salary(callback.from_user.id) + await db_manager.get_all_amount_share(callback.from_user.id) - sum(await db_manager.get_all_transaction_amount(callback.from_user.id))} RUB', reply_markup=keyboard_builder.as_markup())
 
+async def delete_share_start(callback : CallbackQuery, bot : Bot, state : FSMContext):
+    await callback.answer()
+    await bot.send_message(text='Введите ID:', chat_id=callback.message.chat.id)
+    await state.set_state(DeleteShare.share_id)
+
+async def handle_delete_share(callback : CallbackQuery, bot : Bot, db_manager : DatabaseManager):
+    await callback.answer()
+    text = ''
+    for elem in await db_manager.get_all_share(callback.from_user.id):
+        text += str(elem) + '\n'
+        
+    await bot.edit_message_text(text=text, message_id=callback.message.message_id, chat_id=callback.message.chat.id, reply_markup=get_delete_share_keyborad())
+
 async def handle_start_change_transaction(callback : CallbackQuery, bot : Bot, state : FSMContext):
     await callback.answer()
     await bot.send_message(chat_id=callback.message.chat.id, text='Введите ID:')
