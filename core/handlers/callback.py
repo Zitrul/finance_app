@@ -34,7 +34,8 @@ async def handle_delete_share(callback : CallbackQuery, bot : Bot, db_manager : 
     text = ''
     for elem in await db_manager.get_all_share(callback.from_user.id):
         text += str(elem) + '\n'
-        
+    if text == '':
+        text = 'Нету акций!'
     await bot.edit_message_text(text=text, message_id=callback.message.message_id, chat_id=callback.message.chat.id, reply_markup=get_delete_share_keyborad())
 
 async def handle_start_change_transaction(callback : CallbackQuery, bot : Bot, state : FSMContext):
