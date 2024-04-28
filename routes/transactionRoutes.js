@@ -1,6 +1,5 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-
 
 const db = require("../models");
 const mid = require("../middlewares");
@@ -22,7 +21,7 @@ router.post("/add-transaction", mid.authenticate, async (req, res) => {
                 category: category,
                 currency: currency,
             });
-            res.status(200).json("succeeded");
+            res.status(200).json("success");
         } else {
             res.status(400).json("Указана неверная сумма");
         }
@@ -32,7 +31,7 @@ router.post("/add-transaction", mid.authenticate, async (req, res) => {
     }
 });
 
-router.post("/change-transaction", mid.authenticate, async (req, res) => {
+router.put("/change-transaction", mid.authenticate, async (req, res) => {
     try {
         const id = req.query.id;
 
@@ -50,6 +49,25 @@ router.post("/change-transaction", mid.authenticate, async (req, res) => {
 
         await transaction.save();
 
+        res.status(200).json("success");
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
+});
+
+router.delete("/delete-transaction", mid.authenticate, async (req, res) => {
+    try {
+        const id = req.query.id;
+
+        const transaction = await db.Transaction.findOne({
+            where: {
+                id: id,
+                user_id: req.user["id"],
+            },
+        });
+
+        transaction.destroy();
         res.status(200).json("success");
     } catch (err) {
         console.log(err);
@@ -141,10 +159,54 @@ router.post("/add-profit", mid.authenticate, async (req, res) => {
                 category: category,
                 currency: currency,
             });
-            res.status(200).json("succeeded");
+            res.status(200).json("success");
         } else {
             res.status(400).json("Указана неверная сумма");
         }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
+});
+
+router.put("/change-profit", mid.authenticate, async (req, res) => {
+    try {
+        const id = req.query.id;
+
+        const transaction = await db.ProfitableTransaction.findOne({
+            where: {
+                id: id,
+                user_id: req.user["id"],
+            },
+        });
+
+        transaction.name = req.body.name;
+        transaction.amount = req.body.amount;
+        transaction.category = req.body.category;
+        transaction.currency = req.body.currency;
+
+        await transaction.save();
+
+        res.status(200).json("success");
+    } catch (err) {
+        console.log(err);
+        res.status(500).json("smth went wrong");
+    }
+});
+
+router.delete("/delete-profit", mid.authenticate, async (req, res) => {
+    try {
+        const id = req.query.id;
+
+        const transaction = await db.ProfitableTransaction.findOne({
+            where: {
+                id: id,
+                user_id: req.user["id"],
+            },
+        });
+
+        transaction.destroy();
+        res.status(200).json("success");
     } catch (err) {
         console.log(err);
         res.status(500).json("smth went wrong");
