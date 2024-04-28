@@ -3,6 +3,7 @@ import Main from '@/views/Main.vue'
 import Wallet from '@/views/Wallet.vue'
 import News from '@/views/News.vue'
 import Investing from '@/views/Investing.vue'
+import Donate from '@/views/Donate.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/investing',
     name: 'Инвестиции',
     component: Investing
+  },
+  {
+    path: '/donates',
+    name: 'Поддержать MoneyMinder',
+    component: Donate
   },
 ]
 

@@ -40,7 +40,7 @@
         <v-list nav>
             <v-list-item prepend-icon="mdi-wallet" :class="{'text-primary': current_route == '/wallet'}" title="Мои Финансы" value="wallet" to="/wallet"></v-list-item>
             <v-list-item prepend-icon="mdi-briefcase-variant" :class="{'text-primary': current_route == '/investing'}" title="Инвестиции" value="investing" to="/investing"></v-list-item>
-            <v-list-item prepend-icon="mdi-poll" title="Аналитика" value="analytics"></v-list-item>
+            <v-list-item prepend-icon="mdi-gift" :class="{'text-primary': current_route == '/donates'}" title="Поддержать" value="donates" to="/donates"></v-list-item>
             <v-list-item prepend-icon="mdi-newspaper" :class="{'text-primary': current_route == '/news'}" title="Новости" value="news"to="/news"></v-list-item>
         </v-list>
 
