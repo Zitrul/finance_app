@@ -42,7 +42,7 @@ def add_product(user_id: str, name: str, amount: str, category: str, currency: s
     return {"OK": "OK"}
 
 @app.post("/add_user_assets")
-def add_user_assets(user_id: str, company_name: str, asset_amount: str, news_subscription: str, stock_quote: str):
+def add_user_assets(user_id: str, asset_amount: str, news_subscription: str, stock_quote: str):
     current_date = datetime.datetime.now().strftime('%Y-%m-%d')
     result = get_current_price(ticket=stock_quote, date_get=current_date)
     asset_buy_price = result["price"]
