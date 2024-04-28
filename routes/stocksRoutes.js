@@ -1,6 +1,5 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-
 
 const db = require("../models");
 const mid = require("../middlewares");
@@ -8,7 +7,6 @@ const axios = require("axios");
 
 router.post("/add-stocks", mid.authenticate, async (req, res) => {
     const user_id = req.user["id"];
-    const company_name = req.body.company || 0;
     const asset_amount = req.body.amount;
     const stock_quote = req.body.ticker;
     const news_subscription = req.body.news_sub || false;
@@ -17,7 +15,6 @@ router.post("/add-stocks", mid.authenticate, async (req, res) => {
         .post(`http://${process.env.API_IP}:3214/add_user_assets`, null, {
             params: {
                 user_id: user_id,
-                company_name: company_name,
                 asset_amount: asset_amount,
                 stock_quote: stock_quote,
                 news_subscription: news_subscription,
@@ -60,7 +57,46 @@ router.get("/users-stocks", mid.authenticate, async (req, res) => {
             },
         });
 
-        res.status(200).json(stocks);
+        result = {};
+
+        for (let i = 0; i < stocks.length; i++) {
+            const ticker = stocks[i].stock_quote;
+
+            await axios
+                .get(
+                    `http://${process.env.API_IP}:3214/get_current_price_trend`,
+                    {
+                        params: {
+                            ticker: ticker,
+                        },
+                    }
+                )
+                .then((response) => {
+                    result[ticker] = { trend: response.data.trend , trend_percent: 0, price: 0};
+                })
+                .catch((error) => {
+                    console.error(error.response.data.detail);
+                    res.status(500).json("smth went wrong");
+                });
+
+            await axios
+                .get(`http://${process.env.API_IP}:3214/get_current_price`, {
+                    params: {
+                        ticker: ticker,
+                    },
+                })
+                .then((response) => {
+                    result[ticker].trend_percent = (result[ticker].trend / response.data.price * 100).toFixed(2);
+
+                    result[ticker].price = response.data.price;
+                })
+                .catch((error) => {
+                    console.error(error.response.data.detail);
+                    res.status(500).json("smth went wrong");
+                });
+        }
+
+        res.status(200).json(result);
     } catch (err) {
         console.log(err);
         res.status(500).json("smth went wrong");
@@ -121,13 +157,15 @@ router.get("/stocks-shareholding", async (req, res) => {
 
 router.get("/stock-chart", async (req, res) => {
     const ticker = req.body.ticker;
-    const month_ago = charts.formatDate(new Date(new Date() - 30 * 24 * 60 * 60 * 1000));
+    const month_ago = charts.formatDate(
+        new Date(new Date() - 30 * 24 * 60 * 60 * 1000)
+    );
 
     axios
         .get(`http://${process.env.API_IP}:3214/get_history`, {
             params: {
                 ticker: ticker,
-                date_from: month_ago
+                date_from: month_ago,
             },
         })
         .then((response) => {
