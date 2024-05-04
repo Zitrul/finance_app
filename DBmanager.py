@@ -156,6 +156,12 @@ class DBmanager:
                 if transaction[0] <= day:
                     result[day_string] -= float(transaction[1])
         return result
+    def delete_profit_transaction(self, user_id, transaction_id):
+        sql = f"DELETE FROM ProfitableTransaction WHERE id = {transaction_id} AND user_id = {user_id};"
+        self.cur.execute(sql)
+    def delete_transaction(self, user_id, transaction_id):
+        sql = f"DELETE FROM Transaction WHERE id = {transaction_id} AND user_id = {user_id};"
+        self.cur.execute(sql)
     def commit(self):
         self.conn.commit()
 

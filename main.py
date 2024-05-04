@@ -180,5 +180,17 @@ def get_transactions_by_date_controller(user_id: str, datefrom: str):
 def get_prediction_controller(delta: str, ticker: str, days_to_predict: str):
     return get_prediction(datetime.datetime.now(), int(delta), ticker, int(days_to_predict))
 
+@app.post("/delete_profit_transaction")
+def delete_profit_transaction_controller(user_id: str, transaction_id: str):
+    db = DBmanager()
+    db.delete_profit_transaction(user_id, transaction_id)
+    db.commit()
+    return {"Status": "OK"}
+@app.post("/delete_transaction")
+def delete_transaction_controller(user_id: str, transaction_id: str):
+    db = DBmanager()
+    db.delete_transaction(user_id, transaction_id)
+    db.commit()
+    return {"Status": "OK"}
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=3214)
