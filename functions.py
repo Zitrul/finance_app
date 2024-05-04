@@ -4,19 +4,14 @@ import sqlite3
 from datetime import datetime, timedelta
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import requests
 from pyzbar import pyzbar
 import cv2
-from glob import glob
 import pandas as pd
 import DBmanager
 from classes import Product
-import plotly
-import plotly.graph_objs as go
-import plotly.express as px
-from plotly.subplots import make_subplots
 from settings import categories
 
 
