@@ -62,7 +62,7 @@ app.use('/api/account', accountRoutes);
 
 app.get("/api/all-news", mid.authenticate, async (req, res) => {
     const user_id = req.user["id"];
-    const news = await db.LatestNews.findAll();
+    const news = await db.LatestNews.findAll({ limit: 100 });
 
     res.json(news);
 });

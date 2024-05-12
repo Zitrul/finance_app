@@ -7,7 +7,7 @@ function generateAccessToken(user) {
         id: user.id,
         time: new Date().getTime(),
     }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "30m",
+        expiresIn: "24h",
     });
 }
 

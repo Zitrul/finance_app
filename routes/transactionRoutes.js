@@ -213,4 +213,12 @@ router.delete("/delete-profit", mid.authenticate, async (req, res) => {
     }
 });
 
+router.post("/all-profit", mid.authenticate, async (req, res) => {
+    const period = req.body.period; // day | month | 3 months | 6 months | year | all
+    const user_id = req.user["id"];
+    const transactions = await charts.profitByPeriod(period, user_id);
+
+    res.json(transactions);
+});
+
 module.exports = router;

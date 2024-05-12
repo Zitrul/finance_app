@@ -36,6 +36,22 @@ async function transactionsByPeriod(period, user_id) {
     return transactions.reverse();
 }
 
+async function profitByPeriod(period, user_id) {
+    let miliseconds = periodToMiliseconds(period); // how many miliseconds fit in this period
+
+    const transactions = await db.ProfitableTransaction.findAll({
+        where: {
+            created_at: {
+                [sequelize.Op.lt]: new Date(),
+                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+            },
+            user_id: user_id,
+        },
+    });
+
+    return transactions.reverse();
+}
+
 function categoriesAmounts(transactions) {
     let result = {}; // how much money wasted on every category in exact period
     for (let i = 0; i < transactions.length; i++) {
@@ -311,6 +327,7 @@ function formatDate(date) {
 
 module.exports = {
     transactionsByPeriod: transactionsByPeriod,
+    profitByPeriod: profitByPeriod,
     categoriesAmounts: categoriesAmounts,
     top6Categories: top6Categories,
     spendingsByPeriod: spendingsByPeriod,
