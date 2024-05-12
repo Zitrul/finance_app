@@ -165,8 +165,8 @@ async def new_nickname(message: Message, state: FSMContext, bot: Bot, db_manager
 async def handle_share_delete(message : Message, bot : Bot, db_manager : DatabaseManager, state : FSMContext):
     await state.update_data(share_id=message.text.strip())
     data = await state.get_data()
-    await db_manager.delete_share_by_id(data['share_id'])
-    await bot.send_message(text = 'Удалено!', chat_id=message.chat.id)
+    await db_manager.delete_share_by_id(data['share_id'], message.from_user.id)
+    await bot.send_message(text = 'Успешно!', chat_id=message.chat.id)
     await state.clear()
 
 async def new_password(message: Message, state: FSMContext, bot: Bot, db_manager: DatabaseManager):
@@ -199,7 +199,7 @@ async def handle_change_deposit_amount(message : Message, state : FSMContext, bo
     state_deposit = await state.get_data()
     dep_id, name, amount = state_deposit['depId'], state_deposit['name'], state_deposit['amount']
     await state.clear()
-    await db_manager.change_deposit(dep_id, name, amount)
+    await db_manager.change_deposit(dep_id, name, amount, message.from_user.id)
     text = '「✅」 Изменено успешно!\n'
     for elem in await db_manager.get_all_salary(message.from_user.id):
         text += str(elem) + '\n'

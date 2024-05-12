@@ -116,17 +116,23 @@ class DatabaseManager:
                 query = "UPDATE Transaction SET name = %s, amount = %s, category = %s WHERE id = %s"
                 await cur.execute(query, (name, amount, category, trn_id))
 
-    async def change_deposit(self, dep_id, name, amount):
+    async def change_deposit(self, dep_id, name, amount, telegram_id):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                query = "UPDATE ProfitableTransaction SET name = %s, amount = %s WHERE id = %s"
-                await cur.execute(query, (name, amount, dep_id))
-                    
-    async def delete_share_by_id(self, id):
-        async with self.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                query = f'DELETE FROM UserAssets WHERE id = {id}'
+                query = f"SELECT id FROM User WHERE telegram_auth = '{telegram_id}'"
                 await cur.execute(query)
+                user_id = await cur.fetchone()
+                query = "UPDATE ProfitableTransaction SET name = %s, amount = %s WHERE id = %s and user_id = %s"
+                await cur.execute(query, (name, amount, dep_id, user_id))
+                    
+    async def delete_share_by_id(self, id, telegram_id):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                query = f"SELECT id FROM User WHERE telegram_auth = '{telegram_id}'"
+                await cur.execute(query)
+                user_id = await cur.fetchone()
+                query = 'DELETE FROM UserAssets WHERE id = %s and user_id = %s'
+                await cur.execute(query, (id, user_id))
     
     async def get_all_amount_salary(self, telegram_id : int) -> int:
             async with self.pool.acquire() as conn:
