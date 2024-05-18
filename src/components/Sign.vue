@@ -42,14 +42,14 @@
         <v-row justify="center" class="d-flex flex-row">
             <v-col></v-col>
             <v-col cols="12" sm8 md3>
-                <v-card class="rounded-xl" color="#001a23">
+                <v-card class="rounded-xl" color="#001a23" :style="`width: ${xs ? '90vw' : '500px'};`">
                     <div v-if="signup_active">
                         <v-card-title class="text-h4 text-center my-4 title">Здравствуйте!</v-card-title>
 
                         <v-card-text>
                             <v-row justify="center">
                             <v-col>
-                                <v-text-field class="rounded-pill" label="Ваш никнейм" v-model="signup_form.username"></v-text-field>
+                                <v-text-field class="rounded-pill" label="Ваш никнейм" prefix="@" v-model="signup_form.username"></v-text-field>
                                 <v-text-field class="rounded-pill" label="Email" v-model="signup_form.email"></v-text-field>
                                 <v-text-field class="rounded-pill" label="Пароль" type="password" v-model="signup_form.password"></v-text-field>
                                 <v-btn block variant="flat" color="#d5573b" align="center" class="rounded-pill py-6" @click="signup();">
@@ -113,6 +113,13 @@
         </v-row>
     </v-container>
 </template>
+
+<script setup>
+import { useDisplay } from 'vuetify'
+
+// Destructure only the keys you want to use
+const { xs, sm, smAndDown, smAndUp, md, mdAndDown, mdAndUp, lg, lgAndDown, lgAndUp, xl, xlAndDown, xlAndUp, xxl } = useDisplay();
+</script>
   
 <script>
 import * as fun from '@/functions.js'
@@ -161,15 +168,15 @@ export default {
                 if(response.status == 200) {
                     this.$cookies.set('accessToken', response.data.accessToken);
                     this.$cookies.set('refreshToken', response.data.refreshToken);
-                    fun.show('Успешный вход в аккаунт', true);
+                    fun.show(this, 'Успешный вход в аккаунт', true);
                     // this.emit_closing();
                     this.$router.push('/wallet');
                 }
                 else{
-                    fun.show('Произошла неизвестная ошибка');
+                    fun.show(this, 'Произошла неизвестная ошибка');
                 }
             }).catch((error) => {
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             });
         },
         signup() {
@@ -186,14 +193,14 @@ export default {
                 console.log(response);
                 this.loading = false;
                 if(response.status == 200) {
-                    fun.show('Успешный вход в аккаунт', true);
+                    fun.show(this, 'Успешная регистрация', true);
                     this.change_form();
                 }
                 else{
-                    fun.show('Произошла неизвестная ошибка');
+                    fun.show(this, 'Произошла неизвестная ошибка');
                 }
             }).catch((error) => {
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             });
         },
     },

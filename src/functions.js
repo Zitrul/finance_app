@@ -1,24 +1,60 @@
+// import { useToast } from 'vue-toastification'
+const { useToast } = require('vue-toastification');
+const toast = useToast();
+
 const SERVER_URL = "http://localhost:3000/api";
 
 function get_cookie(obj, key){
     return obj.$cookies.get(key);
 }
 
-function show(msg, status=false){
-    const message = document.createElement('div');
-    message.className = status ? 'message-success' : 'message-error';
-    message.textContent = msg;
+function show(obj, msg, status=false){
+    if(status){
+        toast.success(msg, {
+            position: "top-right",
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: false,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: true,
+            rtl: false
+        });
+    }
+    else{
+        toast.error(msg, {
+            position: "top-right",
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: false,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: "button",
+            icon: true,
+            rtl: false
+        });
+    }
+    // const message = document.createElement('div');
+    // message.className = status ? 'message-success' : 'message-error';
+    // message.textContent = msg;
 
-    document.body.appendChild(message);
+    // document.body.appendChild(message);
     
-    setTimeout(() => {
-        message.style.transform = 'translateX(-200px)';
-        message.style.opacity = '1';
-    }, 20);
+    // setTimeout(() => {
+    //     message.style.transform = 'translateX(-200px)';
+    //     message.style.opacity = '1';
+    // }, 20);
     
-    setTimeout(() => {
-        message.style.opacity = '0';
-    }, 2000);
+    // setTimeout(() => {
+    //     message.style.opacity = '0';
+    // }, 2000);
 }
 
 async function check_auth(obj){

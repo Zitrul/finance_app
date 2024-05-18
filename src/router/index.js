@@ -38,4 +38,9 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  document.title = `${String(to.name)} – Money Minder`;
+  next();
+});
+
 export default router

@@ -1,7 +1,7 @@
 <template>
     <v-container class="d-flex flex-column align-center pa-10 bg-surface rounded-xl">
         <v-container class="d-flex flex-row align-center justify-space-between pa-0" fluid>
-            <p class="text-h5">{{edit_mode ? 'Редактировать' : 'Занесение трат'}}</p>
+            <p class="text-h5">{{edit_mode ? 'Редактировать' : 'Занесение прибыли'}}</p>
             <font-awesome-icon :icon="['fas', 'xmark']" @click="close_form()" class="text-h4 cursor-pointer"/>
         </v-container>
         
@@ -32,7 +32,7 @@
                 v-model="price"
                 :rules="priceRules"
                 type="number"
-                label="Стоимость"
+                label="Сумма"
                 prefix="₽"
                 required
             ></v-text-field>
@@ -66,38 +66,6 @@
             ></v-progress-circular>
         </v-overlay>
 
-        <!-- <v-dialog
-        v-model="loading"
-        max-width="320"
-        persistent
-        >
-        <v-list
-            class="py-2"
-            color="primary"
-            elevation="12"
-            rounded="lg"
-        >
-            <v-list-item
-            prepend-icon="mdi-creation"
-            title="Обрабатываем ваш QR"
-            >
-            <template v-slot:prepend>
-                <div class="pe-4">
-                <v-icon color="primary" size="x-large"></v-icon>
-                </div>
-            </template>
-
-            <template v-slot:append>
-                <v-progress-circular
-                color="primary"
-                indeterminate="disable-shrink"
-                size="16"
-                width="2"
-                ></v-progress-circular>
-            </template>
-            </v-list-item>
-        </v-list>
-        </v-dialog> -->
     </v-container>
     
 </template>
@@ -108,7 +76,7 @@ import * as fun from '@/functions.js'
 import { useDisplay } from 'vuetify'
 
 export default {
-    name: 'TransactionForm',
+    name: 'IncomeTransactionForm',
     props: {
         edit_mode: {
             type: Boolean,
@@ -195,7 +163,7 @@ export default {
                     this.loading = true;
                     this.axios({
                         method: 'post',
-                        url: `${fun.SERVER_URL}/transactions/add-transaction`,
+                        url: `${fun.SERVER_URL}/transactions/add-profit`,
                         data: {
                             name: this.name,
                             category: this.category_selected == this.categories[0] ? this.other_category : this.category_selected,

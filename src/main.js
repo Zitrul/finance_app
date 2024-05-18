@@ -7,10 +7,14 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueCookies from 'vue-cookies';
 import VueQrcodeReader from 'vue3-qrcode-reader'
+
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
+
 import './assets/tailwind.css'
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
 
 library.add(fas);
 loadFonts()
@@ -26,5 +30,6 @@ app.config.globalProperties.axios = axios;
 app.use(router)
   .use(vuetify)
   .use(VueQrcodeReader)
+  .use(Toast)
   .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');

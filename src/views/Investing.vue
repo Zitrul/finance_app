@@ -83,6 +83,9 @@
                         indeterminate
                         ></v-progress-circular>
                     </v-col>
+                    <v-col>
+                        <StockList></StockList>
+                    </v-col>
                 </v-row>
             </v-col>
 
@@ -111,19 +114,94 @@ import * as fun from "@/functions.js";
 
 import TradingVue from 'trading-vue-js'
 
+import StockList from '@/components/StockList'
+
 export default {
   name: "Investing",
   components: {
     UsualBar,
     ContentWrapper,
     AddActionForm,
-    TradingVue
+    TradingVue,
+    StockList,
   },
   data() {
     return {
         add_action_form_opened: false,
         loading_content: false,
         user_stocks: [
+            {
+                ticker: "PORN",
+                price: 100.89,
+                difference: -0.24,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "XXX",
+                price: 50.89,
+                difference: 25,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "S911",
+                price: 100.89,
+                difference: 4.56,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "AMST",
+                price: 100.89,
+                difference: -0.5,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "PLKA",
+                price: 100.89,
+                difference: -8,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "YNDX",
+                price: 100.89,
+                difference: 12,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "PORN",
+                price: 100.89,
+                difference: -0.24,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "XXX",
+                price: 50.89,
+                difference: 25,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "S911",
+                price: 100.89,
+                difference: 4.56,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "AMST",
+                price: 100.89,
+                difference: -0.5,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "PLKA",
+                price: 100.89,
+                difference: -8,
+                difference_money: 120.56,
+            },
+            {
+                ticker: "YNDX",
+                price: 100.89,
+                difference: 12,
+                difference_money: 120.56,
+            },
             {
                 ticker: "PORN",
                 price: 100.89,
@@ -212,11 +290,11 @@ export default {
                 this.loading_content = false;
             }
             else{
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('Произошла неизвестная ошибка');
+            fun.show(this, 'Произошла неизвестная ошибка');
         });
     },
     change_period(ind){

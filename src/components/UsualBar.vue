@@ -40,8 +40,8 @@
         <v-list nav>
             <v-list-item prepend-icon="mdi-wallet" :class="{'text-primary': current_route == '/wallet'}" title="Мои Финансы" value="wallet" to="/wallet"></v-list-item>
             <v-list-item prepend-icon="mdi-briefcase-variant" :class="{'text-primary': current_route == '/investing'}" title="Инвестиции" value="investing" to="/investing"></v-list-item>
-            <v-list-item prepend-icon="mdi-gift" :class="{'text-primary': current_route == '/donates'}" title="Поддержать" value="donates" to="/donates"></v-list-item>
             <v-list-item prepend-icon="mdi-newspaper" :class="{'text-primary': current_route == '/news'}" title="Новости" value="news"to="/news"></v-list-item>
+            <v-list-item prepend-icon="mdi-gift" :class="{'text-primary': current_route == '/donates'}" title="Поддержать" value="donates" to="/donates"></v-list-item>
         </v-list>
 
         <v-spacer></v-spacer>
@@ -89,8 +89,15 @@
                     
                     <p>Email</p>
                     <v-text-field v-model="account.email" density="compact"></v-text-field>
+                    
 
-                    <v-btn variant="text" block color="red-darken-2" append-icon="mdi-logout-variant" density="compact" @click="logout()">Выйти из аккаунта</v-btn>
+                    <v-btn v-if="account.telegram_auth === true" variant="flat" color="red" block prepend-icon="mdi-account-remove" @click="reset_tg()">Отвзяать Telegram</v-btn>
+                    <v-btn v-else variant="flat" elevation="2" block color="#0396de" target="_blank" :href="`https://t.me/MoneyMinderTGBot?start=${String(account.telegram_auth)}`">
+                        <img :src="require('@/assets/img/telegram.png')" style="height: 20px;">
+                        <p class="ml-2">Привязать Telegram</p>
+                    </v-btn>
+
+                    <v-btn variant="text" block color="red-darken-2" append-icon="mdi-logout-variant" density="compact" @click="logout()" class="mt-4">Выйти из аккаунта</v-btn>
                     <!-- <v-btn variant="text" block color="red-darken-2" append-icon="mdi-logout-variant" density="compact" @click="logout">Выйти из аккаунта на всех устройствах</v-btn> -->
                 </v-card-text>
                 <template v-slot:actions>
@@ -153,12 +160,26 @@ export default {
                 data: this.account,
             }).then((response) => {
                 if(response.status === 200) {
-                    fun.show("Данные успешно обновлены", true);
+                    fun.show(this, "Данные успешно обновлены", true);
                     this.username = this.account.username;
                     this.account_opened = false;
                 }
             }).catch((error) => {
-                fun.show("Такой email или никнейм уже занят");
+                fun.show(this, "Такой email или никнейм уже занят");
+                this.account_opened = false;
+            });
+        },
+        reset_tg(){
+            this.axios({
+                method: 'post',
+                url: `${fun.SERVER_URL}/account/reset-telegram`,
+            }).then((response) => {
+                if(response.status === 200) {
+                    fun.show(this, "Telegram успешно отвязан", true);
+                    this.get_account_info();
+                }
+            }).catch((error) => {
+                fun.show(this, "Такой email или никнейм уже занят");
                 this.account_opened = false;
             });
         },
@@ -167,7 +188,19 @@ export default {
                 this.$cookies.remove(cookie);
             })
             this.$router.push('/');
-        }
+        },
+        get_account_info(){
+            this.axios({
+                method: 'get',
+                url: `${fun.SERVER_URL}/account/account-info`,
+            }).then((response) => {
+                this.account = response.data;
+                console.log(this.account)
+                this.username = response.data.username;
+            }).catch((error) => {
+                console.log(error)
+            });
+        },
     },
     computed: {
         current_route() {
@@ -178,17 +211,7 @@ export default {
         this.drawer = this.smAndUp ? true : false;
         this.rail = this.smAndUp ? true : false;
 
-        this.axios({
-            method: 'get',
-            url: `${fun.SERVER_URL}/account/account-info`,
-        }).then((response) => {
-            if(response.status === 200) {
-                this.account = response.data;
-                this.username = response.data.username;
-            }
-        }).catch((error) => {
-            console.log(error)
-        });
+        this.get_account_info();
     },
     setup() {
         const { xs, sm, smAndDown, smAndUp, md, mdAndDown, mdAndUp, lg, lgAndDown, lgAndUp, xl, xlAndDown, xlAndUp, xxl } = useDisplay();

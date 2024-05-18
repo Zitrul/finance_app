@@ -103,11 +103,11 @@ export default {
                 this.loading_content = false;
             }
             else{
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('Произошла неизвестная ошибка');
+            fun.show(this, 'Произошла неизвестная ошибка');
         });
     },
     find_news(){

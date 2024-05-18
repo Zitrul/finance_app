@@ -104,7 +104,7 @@
             <v-col cols="1" v-if="lgAndUp">
             </v-col>
 
-            <v-col :cols="mdAndDown ? 12 : 7">
+            <v-col :cols="mdAndDown ? 12 : 11">
                 <v-row>
                     <v-col cols="12">
                         <v-row>
@@ -129,13 +129,13 @@
                         <v-col>
                             <div class="mt-3"></div>
                             <v-row>
-                                <v-menu v-model="menuOpen">
+                                <v-menu v-model="menu2Open">
                                     <template v-slot:activator="{ props }">
                                         <v-btn
                                         color="primary"
                                         v-bind="props"
                                         >
-                                        {{ periods[period_selected].title }} <font-awesome-icon :icon="['fas', menuOpen ? 'angle-up' : 'angle-down']" class="ml-2"/>
+                                        {{ periods[period2_selected].title }} <font-awesome-icon :icon="['fas', menuOpen ? 'angle-up' : 'angle-down']" class="ml-2"/>
                                         </v-btn>
                                     </template>
                                     <v-list>
@@ -143,22 +143,42 @@
                                         v-for="(item, index) in periods"
                                         :key="index"
                                         :value="index"
-                                        @click="change_period(index)"
+                                        @click="this.period2_selected = index; fetch_transactions();"
                                         >
                                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                                         </v-list-item>
                                     </v-list>
                                 </v-menu>
-                                
-                                <div class="d-flex flex-row ma-0 ml-5">
-                                    <v-btn variant="plain" @click="change_income_chart('line')" title="Линейный график"><font-awesome-icon :icon="['fas', 'chart-line']"/></v-btn>
-                                    <v-btn variant="plain" @click="change_income_chart('pie')" title="График-пирог"><font-awesome-icon :icon="['fas', 'chart-pie']" /></v-btn>
-                                    <v-btn variant="plain" @click="change_income_chart('bar')" title="Столбцовый график"><font-awesome-icon :icon="['fas', 'chart-simple']" /></v-btn>
-                                </div>
                             </v-row>
                             <v-row>
-                                <div class="chart_container mt-7">
-                                    <canvas id="income_chart"></canvas>
+                                <div class="chart_container">
+                                    <v-card>
+                                        <v-list>
+                                            <v-list-item
+                                                v-for="val in current_profit_list"
+                                                :key="val.id"
+                                                :subtitle="val.category"
+                                                
+                                                class="pa-2"
+                                            >
+                                                <div class="d-flex flex-row justify-space-between">
+                                                    <p class="text-primary font-weight-medium">{{ val.amount }} ₽</p>
+                                                    <p class="font-weight-medium">{{ val.name }}</p>
+                                                    <p>{{ fun.format_current_date(val.created_at) }}</p>
+
+                                                    <v-btn icon="mdi-pencil" density="comfortable" variant="text"></v-btn>
+                                                    <!-- @click="open_edit_form(val.id);" -->
+                                                </div>
+                                            </v-list-item>
+                                        </v-list>
+                                        <div class="text-center">
+                                            <v-pagination
+                                            v-model="transaction_page"
+                                            fluid
+                                            :length="Math.floor(transactions.length / transactions_pro_page) + (transactions.length % transactions_pro_page == 0 ? 0 : 1)"
+                                            ></v-pagination>
+                                        </div>
+                                    </v-card>
                                 </div>
                             </v-row>
                         </v-col>
@@ -166,7 +186,7 @@
                 </div>
             </v-col>
 
-            <v-col :cols="smAndDown ? 12 : (lgAndUp ? 3 : 5)">
+            <!-- <v-col :cols="smAndDown ? 12 : (lgAndUp ? 3 : 5)">
                 <v-card>
                     <p class="text-h4 text-text_title">Список получек</p>
                     <v-list>
@@ -193,18 +213,27 @@
                         ></v-pagination>
                     </div>
                 </v-card>
-            </v-col>
+            </v-col> -->
         </v-row>
 
         <v-overlay v-model="scanner_opened" class="align-center justify-center">
             <QrScanner @closed="scanner_opened = false; change_period(period_selected);"></QrScanner>
         </v-overlay>
+
         <v-overlay v-model="transactin_form_opened" class="align-center justify-center">
             <TransactionForm @closed="transactin_form_opened = false; change_period(period_selected);"></TransactionForm>
         </v-overlay>
         <v-overlay v-model="edit_transaction_form_opened" class="align-center justify-center">
             <TransactionForm :edit_mode="true" :Ename="edit_form.name" :Eprice="edit_form.price" :Ecategory_selected="edit_form.category" :Eid="edit_form.id"
             @closed="edit_transaction_form_opened = false; change_period(period_selected);"></TransactionForm>
+        </v-overlay>
+
+        <v-overlay v-model="income_transactin_form_opened" class="align-center justify-center">
+            <IncomeTransactionForm @closed="income_transactin_form_opened = false; change_period(period_selected);"></IncomeTransactionForm>
+        </v-overlay>
+        <v-overlay v-model="edit_income_transaction_form_opened" class="align-center justify-center">
+            <IncomeTransactionForm :edit_mode="true" :Ename="income_edit_form.name" :Eprice="income_edit_form.price" :Ecategory_selected="income_edit_form.category" :Eid="income_edit_form.id"
+            @closed="edit_income_transaction_form_opened = false; change_period(period_selected);"></IncomeTransactionForm>
         </v-overlay>
     </ContentWrapper>
 </template>
@@ -221,6 +250,7 @@ import Sign from "@/components/Sign.vue";
 import UsualBar from '@/components/UsualBar.vue'
 import QrScanner from '@/components/QrScanner.vue'
 import TransactionForm from '@/components/TransactionForm.vue'
+import IncomeTransactionForm from '@/components/IncomeTransactionForm.vue'
 import ContentWrapper from '@/components/ContentWrapper.vue'
 import * as fun from "@/functions.js";
 
@@ -233,6 +263,7 @@ export default {
     UsualBar,
     QrScanner,
     TransactionForm,
+    IncomeTransactionForm,
     ContentWrapper
   },
   data() {
@@ -265,7 +296,9 @@ export default {
         },
       ],
       period_selected: 1,
+      period2_selected: 1,
       menuOpen: false,
+      menu2Open: false,
       current_chart_variable: null,
       chart_last_update: new Date().getTime(),
       current_chart_type: "line",
@@ -284,6 +317,9 @@ export default {
       transactions: [],
       transactions_pro_page: 8,
       transaction_page: 1,
+      profits: [],
+      profits_pro_page: 8,
+      profits_page: 1,
 
       edit_form: {
         id: 0,
@@ -292,7 +328,15 @@ export default {
         category: '',
       },
       edit_transaction_form_opened: false,
+
+      income_edit_form: {
+        id: 0,
+        name: '',
+        price: '',
+        category: '',
+      },
       income_transactin_form_opened: false,
+      edit_income_transaction_form_opened: false,
     };
   },
   methods: {
@@ -344,11 +388,29 @@ export default {
                 this.transactions = response.data;
             }
             else{
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('Произошла неизвестная ошибка');
+            fun.show(this, 'Произошла неизвестная ошибка');
+        });
+        
+        this.axios({
+            method: 'post',
+            url: `${fun.SERVER_URL}/transactions/all-profit`,
+            data: {
+                period: this.periods[this.period2_selected].code,
+            }
+        }).then(async (response) => {
+            if(response.status == 200) {
+                this.profits = response.data;
+            }
+            else{
+                fun.show(this, 'Произошла неизвестная ошибка');
+            }
+        }).catch((error) => {
+            console.error(error);
+            fun.show(this, 'Произошла неизвестная ошибка');
         });
     },
     async bar_chart(){
@@ -424,11 +486,11 @@ export default {
                 }
             }
             else{
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('Произошла неизвестная ошибка');
+            fun.show(this, 'Произошла неизвестная ошибка');
         });
     },
     async pie_chart(){
@@ -483,11 +545,11 @@ export default {
                 }
             }
             else{
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('Произошла неизвестная ошибка');
+            fun.show(this, 'Произошла неизвестная ошибка');
         });
     },
     async line_chart(){
@@ -540,17 +602,20 @@ export default {
                 }
             }
             else{
-                fun.show('Произошла неизвестная ошибка');
+                fun.show(this, 'Произошла неизвестная ошибка');
             }
         }).catch((error) => {
             console.error(error);
-            fun.show('Произошла неизвестная ошибка');
+            fun.show(this, 'Произошла неизвестная ошибка');
         });
     },
   },
   computed: {
     current_transactions_list() {
         return this.transactions.slice(this.transactions_pro_page * (this.transaction_page - 1), this.transactions_pro_page * (this.transaction_page));
+    },
+    current_profit_list() {
+        return this.profits.slice(this.transactions_pro_page * (this.profits_page - 1), this.profits_pro_page * (this.profits_page));
     }
   },
   mounted() {
