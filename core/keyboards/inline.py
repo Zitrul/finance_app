@@ -6,23 +6,10 @@ def get_log_in_keyboard():
     keyboard_builder.button(text="Войти по логину / паролю", callback_data="log_in")
     return keyboard_builder.as_markup()
 
-def get_change_transaction_keyboard():
-    keyboard_builder = InlineKeyboardBuilder()
-    keyboard_builder.button(text='Изменить', callback_data='change_transaction_start')
-    keyboard_builder.button(text="↩️ Назад", callback_data="menu")
-    return keyboard_builder.adjust(1, 1).as_markup()
-
-
-def get_change_deposit_keyboard():
-    keyboard_builder = InlineKeyboardBuilder()
-    keyboard_builder.button(text="Изменить", callback_data='change_deposite_start')
-    keyboard_builder.button(text="↩️ Назад", callback_data="menu")
-    return keyboard_builder.adjust(1, 1).as_markup()
-
 def get_change_money_info_keyboard():
     keyboard_builder = InlineKeyboardBuilder()
-    keyboard_builder.button(text="Изменить доходы", callback_data='change_deposite')
-    keyboard_builder.button(text="Изменить траты", callback_data="change_transaction")
+    keyboard_builder.button(text="Изменить доходы", callback_data='change_deposite_next_0')
+    keyboard_builder.button(text="Изменить траты", callback_data="change_transaction_next_0")
     keyboard_builder.button(text="↩️ Назад", callback_data="menu")
     return keyboard_builder.adjust(1, 1).as_markup()
 
@@ -59,4 +46,9 @@ def get_about_menu_keyboard():
 def get_return_keyboard():
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text='↩️ Назад', callback_data='menu')
+    return keyboard_builder.as_markup()
+
+def get_delete_keyboard():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text='❌ Закрыть', callback_data='delete_message')
     return keyboard_builder.as_markup()

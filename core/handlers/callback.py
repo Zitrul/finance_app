@@ -49,26 +49,78 @@ async def change_deposit_start(callback : CallbackQuery, bot: Bot, state : FSMCo
     await state.set_state(ChangeDeposit.depId)
 
 async def change_transaction(callback : CallbackQuery, bot : Bot, db_manager : DatabaseManager):
-    await callback.answer()
-    text = '////'
-    # for elem in await db_manager.get_transactions(callback.from_user.id):
-    #     text += str(elem) + '\n'
-    #print(text)
+    page_data = callback.data.split("_")
+    direction, page_number = page_data[2], int(page_data[3])
+
+    page_size = 10
+    if direction == 'prev':
+        page_number -= 1
+    elif direction == 'next':
+        page_number += 1
+
+    raw_data = await db_manager.get_transactions(callback.from_user.id)
+
+    data = [element for element in raw_data]
+
+    start_index = (page_number - 1) * page_size
+    end_index = min(start_index + page_size, len(data))
+
+    chunk = data[start_index:end_index]
+
+    text = ''
+    for elem in chunk:
+        text += f"{elem[0]}. {elem[1]} - {elem[3]}: {elem[2]}\n"
+
+    keyboard_builder = InlineKeyboardBuilder()
+    if start_index > 0:
+        keyboard_builder.button(text="◀️ Предыдущая", callback_data=f"change_transaction_prev_{page_number}")
+    if end_index < len(data):
+        keyboard_builder.button(text="Следующая ▶️", callback_data=f"change_transaction_next_{page_number}")
+    keyboard_builder.button(text="Изменить", callback_data='start_change_transaction')
+    keyboard_builder.button(text="↩️ Назад", callback_data="menu")
+
     await bot.edit_message_text(chat_id=callback.message.chat.id,
-                                text = text,
+                                text=text,
                                 message_id=callback.message.message_id,
-                                reply_markup=get_change_transaction_keyboard())
+                                reply_markup=keyboard_builder.adjust(2, repeat=True).as_markup())
+    await callback.answer()
 
 async def change_deposit(callback : CallbackQuery, bot : Bot, db_manager : DatabaseManager):
-    await callback.answer()
+    page_data = callback.data.split("_")
+    direction, page_number = page_data[2], int(page_data[3])
+
+    page_size = 10
+    if direction == 'prev':
+        page_number -= 1
+    elif direction == 'next':
+        page_number += 1
+
+    raw_data = await db_manager.get_all_salary(callback.from_user.id)
+
+    data = [element for element in raw_data]
+
+    start_index = (page_number - 1) * page_size
+    end_index = min(start_index + page_size, len(data))
+
+    chunk = data[start_index:end_index]
+
     text = ''
-    for elem in await db_manager.get_all_salary(callback.from_user.id):
-        text += str(elem) + '\n'
+    for elem in chunk:
+        text += f"{elem[0]}. {elem[1]} - {elem[3]}: {elem[2]} {elem[4]}\n"
+
+    keyboard_builder = InlineKeyboardBuilder()
+    if start_index > 0:
+        keyboard_builder.button(text="◀️ Предыдущая", callback_data=f"change_deposite_prev_{page_number}")
+    if end_index < len(data):
+        keyboard_builder.button(text="Следующая ▶️", callback_data=f"change_deposite_next_{page_number}")
+    keyboard_builder.button(text="Изменить", callback_data='start_change_deposite')
+    keyboard_builder.button(text="↩️ Назад", callback_data="menu")
     
     await bot.edit_message_text(chat_id=callback.message.chat.id,
                                 message_id=callback.message.message_id,
                                 text=text,
-                                reply_markup=get_change_deposit_keyboard())
+                                reply_markup=keyboard_builder.adjust(2, repeat=True).as_markup())
+    await callback.answer()
 
 async def handle_qr(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await callback.answer()
@@ -216,5 +268,13 @@ async def handle_show_visuals(callback: CallbackQuery, state: FSMContext, bot: B
     plt.savefig('plot.png')  # Сохраняем график как изображение
 
     chat_id = callback.message.chat.id
-    await bot.send_photo(chat_id, FSInputFile("plot.png"))
+    await bot.send_photo(chat_id, FSInputFile("plot.png"),
+                         reply_markup=get_delete_keyboard())
 
+
+async def handle_delete_message(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await callback.answer()
+    try:
+        await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
+    except Exception as e:
+        pass

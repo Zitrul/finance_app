@@ -44,12 +44,12 @@ async def start():
     dp.callback_query.register(handle_get_data, F.data == "get_data")
     dp.callback_query.register(handle_add_transaction, F.data == "add_transaction")
     dp.callback_query.register(handle_qr, F.data == "send_QR")
-    dp.callback_query.register(change_deposit, F.data == "change_deposite")
+    dp.callback_query.register(change_deposit, F.data.startswith("change_deposite"))
     dp.callback_query.register(handle_deposite_money, F.data == "deposite_money")
     dp.callback_query.register(handle_sell_shares, F.data == "sell_shares")
     dp.callback_query.register(process_data_navigation, F.data.startswith("page_"))
     dp.callback_query.register(handle_show_visuals, F.data == 'get_visuals')
-    dp.callback_query.register(change_transaction, F.data == "change_transaction")
+    dp.callback_query.register(change_transaction, F.data.startswith("change_transaction"))
 
     # change email
     dp.callback_query.register(handle_change_email, F.data == "change_email")
@@ -57,7 +57,7 @@ async def start():
     dp.message.register(new_email, ChangeEmail.new_email)
 
     #change transaction
-    dp.callback_query.register(handle_start_change_transaction, F.data == 'change_transaction_start')
+    dp.callback_query.register(handle_start_change_transaction, F.data == 'start_change_transaction')
     dp.message.register(handle_change_transaction_id, ChangeTransaction.trnId)
     dp.message.register(handle_change_transaction_name, ChangeTransaction.name)
     dp.message.register(handle_change_transaction_amount, ChangeTransaction.amount)
@@ -69,7 +69,7 @@ async def start():
     dp.message.register(handle_share_delete, DeleteShare.share_id)
     
     #change deposit
-    dp.callback_query.register(change_deposit_start, F.data == "change_deposite_start")
+    dp.callback_query.register(change_deposit_start, F.data == "start_change_deposite")
     dp.message.register(handle_change_deposit_id, ChangeDeposit.depId)
     dp.message.register(handle_change_deposit_name, ChangeDeposit.name)
     dp.message.register(handle_change_deposit_amount, ChangeDeposit.amount)
@@ -94,6 +94,8 @@ async def start():
     dp.message.register(deposite_money_sum, FormDepositeMpney.sum)
     dp.message.register(sell_shares_ticker, FormSellShares.ticker)
     dp.message.register(sell_shares_amount, FormSellShares.amount)
+
+    dp.callback_query.register(handle_delete_message, F.data == "delete_message")
 
     try:
         await dp.start_polling(bot)

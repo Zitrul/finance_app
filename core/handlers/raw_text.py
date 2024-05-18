@@ -201,18 +201,16 @@ async def handle_change_deposit_amount(message : Message, state : FSMContext, bo
     await state.clear()
     await db_manager.change_deposit(dep_id, name, amount, message.from_user.id)
     text = '「✅」 Изменено успешно!\n'
-    for elem in await db_manager.get_all_salary(message.from_user.id):
-        text += str(elem) + '\n'
         
-    await bot.send_message(message.chat.id, text=text, reply_markup=get_change_deposit_keyboard())
+    await bot.send_message(message.chat.id, text=text, reply_markup=get_return_keyboard())
 
 async def handle_change_transaction_category(message : Message, state :FSMContext, bot : Bot, db_manager : DatabaseManager):
     await state.update_data(category = message.text.split())
     state_trn = await state.get_data()
     await state.clear()
     trn_id, name, amount, category = state_trn['trnId'], state_trn['name'], state_trn['amount'], state_trn['category']
-    await db_manager.change_transaction(trn_id, name, amount, category)
-    await bot.send_message(message.chat.id, text='「✅」 Изменено успешно!', reply_markup=get_change_transaction_keyboard())
+    await db_manager.change_transaction(trn_id, name, amount, category, message.from_user.id)
+    await bot.send_message(message.chat.id, text='「✅」 Изменено успешно!', reply_markup=get_return_keyboard())
 
 async def handle_change_transaction_amount(message : Message, state :FSMContext, bot : Bot):
     await state.update_data(amount = message.text.split())

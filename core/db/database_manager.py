@@ -110,11 +110,13 @@ class DatabaseManager:
                 res = await cur.fetchall()
                 return [i for i in res]
 
-    async def change_transaction(self, trn_id, name, amount, category):
+    async def change_transaction(self, trn_id, name, amount, category, telegram_id):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                query = "UPDATE Transaction SET name = %s, amount = %s, category = %s WHERE id = %s"
-                await cur.execute(query, (name, amount, category, trn_id))
+                user_id = await self.get_user_by_telegram_id(telegram_id)
+                user_id = user_id['id']
+                query = "UPDATE Transaction SET name = %s, amount = %s, category = %s WHERE id = %s and user_id = %s"
+                await cur.execute(query, (name, amount, category, trn_id, user_id))
 
     async def change_deposit(self, dep_id, name, amount, telegram_id):
         async with self.pool.acquire() as conn:
