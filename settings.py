@@ -11,7 +11,7 @@ host = "46.188.100.158"
 port = 3306
 user = "sigma"
 password = "j$sdjk!53"
-db = "main_db"
+db_name = "main_db"
 charset = 'utf8'
 
 # Categories

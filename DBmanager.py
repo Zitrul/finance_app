@@ -1,16 +1,16 @@
 import datetime
 
 import pymysql.cursors
-
+from settings import host, port, password,user, db_name
 
 class DBmanager:
     def __init__(self):
 
-        self.conn = pymysql.connect(host="46.188.100.158",
-                                    port=3306,
-                                    user="sigma",
-                                    password="j$sdjk!53",
-                                    db="main_db",
+        self.conn = pymysql.connect(host=host,
+                                    port=port,
+                                    user=user,
+                                    password=password,
+                                    db=db_name,
                                     charset='utf8',
                                     )
         self.cur = self.conn.cursor()
