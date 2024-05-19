@@ -18,7 +18,8 @@ const stocksRoutes = require('./routes/stocksRoutes.js');
 const accountRoutes = require('./routes/accountRoutes.js');
 
 const app = express();
-const port = Number(process.env.PORT) || 3000;
+const port = 3000;
+// const port = Number(process.env.PORT) || 3000;
 
 
 app.use(function (req, res, next) {
@@ -85,9 +86,9 @@ app.get("/api/token-test", mid.authenticate, (req, res) => {
     });
 });
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "dist", "index.html"));
-// });
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 // -------------------------------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------------------------------

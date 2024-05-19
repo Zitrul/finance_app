@@ -77,10 +77,7 @@ router.post("/reset-telegram", mid.authenticate, async (req, res) => {
             res.status(400).json("you are not authenticated");
         } else {
             user.telegram_bot_token =
-                require("crypto").randomBytes(16).toString("hex") +
-                encodeURIComponent(
-                    bcrypt.hashSync(user.username, bcrypt.genSaltSync()).toString() // 16 random hex symbols + 16 symbols of hashed username
-                ).substring(0, 16);
+                require("crypto").randomBytes(32).toString("hex")
 
             await user.save();
 

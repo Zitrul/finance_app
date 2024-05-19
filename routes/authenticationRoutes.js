@@ -27,12 +27,7 @@ router.post("/register", async (req, res) => {
                         email_auth: email,
                         password: hash.toString(),
                         telegram_bot_token:
-                            require("crypto").randomBytes(16).toString("hex") +
-                            encodeURIComponent(
-                                bcrypt
-                                    .hashSync(username, bcrypt.genSaltSync()) // 16 random hex symbols + 16 symbols of hashed username
-                                    .toString()
-                            ).substring(0, 16),
+                            require("crypto").randomBytes(32).toString("hex")
                     },
                 });
                 if (created) {
