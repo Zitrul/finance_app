@@ -109,18 +109,21 @@ router.delete("/delete-transaction", mid.authenticate, async (req, res) => {
 }); */
 
 router.post("/scan-detected-qr", mid.authenticate, (req, res) => {
+    console.log(req.body);
+    console.log(req.body.data);
     axios
         .get(`http://${process.env.API_IP}:3214/get_qr_info`, {
             params: {
                 user_id: req.user["id"],
                 qr_data: req.body.data,
-                auto_sort: true,
+                auto_sort: false,
             },
         })
         .then((response) => {
             res.json(response.data);
         })
         .catch((error) => {
+            console.log(error);
             console.error(error.response.data.detail);
             res.status(500).json("smth went wrong");
         });

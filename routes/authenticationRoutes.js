@@ -7,6 +7,9 @@ const auth = require("../functions/auth.js");
 const bcrypt = require("bcrypt");
 const sequelize = require("sequelize");
 
+var Recaptcha = require('express-recaptcha').RecaptchaV3
+var recaptcha = new Recaptcha('6LdHluEpAAAAALKfNzf0z2ACB3a5ztj24p0GqqRv', '6LdHluEpAAAAAPtrDsOwJ2RQEIhfixfzM7QpyRHL', { callback: 'cb' })
+// recaptcha.middleware.verify,
 router.post("/register", async (req, res) => {
     try {
         const username = req.body.username;
