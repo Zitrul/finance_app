@@ -83,9 +83,6 @@
                         indeterminate
                         ></v-progress-circular>
                     </v-col>
-                    <v-col>
-                        <StockList></StockList>
-                    </v-col>
                 </v-row>
             </v-col>
 
@@ -131,19 +128,19 @@ export default {
         loading_content: false,
         user_stocks: [
             {
-                ticker: "PORN",
+                ticker: "USLD",
                 price: 100.89,
                 difference: -0.24,
                 difference_money: 120.56,
             },
             {
-                ticker: "XXX",
+                ticker: "SPRT",
                 price: 50.89,
                 difference: 25,
                 difference_money: 120.56,
             },
             {
-                ticker: "S911",
+                ticker: "YNDX",
                 price: 100.89,
                 difference: 4.56,
                 difference_money: 120.56,
@@ -155,87 +152,15 @@ export default {
                 difference_money: 120.56,
             },
             {
-                ticker: "PLKA",
-                price: 100.89,
-                difference: -8,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "YNDX",
-                price: 100.89,
-                difference: 12,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "PORN",
-                price: 100.89,
-                difference: -0.24,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "XXX",
-                price: 50.89,
-                difference: 25,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "S911",
+                ticker: "REDL",
                 price: 100.89,
                 difference: 4.56,
                 difference_money: 120.56,
             },
             {
-                ticker: "AMST",
+                ticker: "GOGL",
                 price: 100.89,
                 difference: -0.5,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "PLKA",
-                price: 100.89,
-                difference: -8,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "YNDX",
-                price: 100.89,
-                difference: 12,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "PORN",
-                price: 100.89,
-                difference: -0.24,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "XXX",
-                price: 50.89,
-                difference: 25,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "S911",
-                price: 100.89,
-                difference: 4.56,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "AMST",
-                price: 100.89,
-                difference: -0.5,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "PLKA",
-                price: 100.89,
-                difference: -8,
-                difference_money: 120.56,
-            },
-            {
-                ticker: "YNDX",
-                price: 100.89,
-                difference: 12,
                 difference_money: 120.56,
             },
         ],

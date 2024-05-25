@@ -2,7 +2,7 @@
 const { useToast } = require('vue-toastification');
 const toast = useToast();
 
-const SERVER_URL = "http://localhost:3000/api";
+const SERVER_URL = "/api";
 
 function get_cookie(obj, key){
     return obj.$cookies.get(key);

@@ -1,7 +1,10 @@
 <template>
     <ContentWrapper>
         <v-row cols="12" class="d-flex flex-row justify-center">
+          <v-col class="d-flex flex-column ">
             <iframe src="https://yoomoney.ru/quickpay/fundraise/button?billNumber=128DVDF9SVC.240421&" width="330" height="50" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+            <img :src="require('@/assets/img/poor_coder.jpg')" style="max-height: calc(100vh - 500px);">
+          </v-col>
         </v-row>
     </ContentWrapper>
 </template>

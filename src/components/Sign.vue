@@ -52,6 +52,16 @@
                                 <v-text-field class="rounded-pill" label="Ваш никнейм" prefix="@" v-model="signup_form.username"></v-text-field>
                                 <v-text-field class="rounded-pill" label="Email" v-model="signup_form.email"></v-text-field>
                                 <v-text-field class="rounded-pill" label="Пароль" type="password" v-model="signup_form.password"></v-text-field>
+                                <!-- <vue-recaptcha v-show="showRecaptcha" sitekey="6LdHluEpAAAAALKfNzf0z2ACB3a5ztj24p0GqqRv"
+                                    size="normal" 
+                                    theme="dark"
+                                    :loading-timeout="loadingTimeout"
+                                    @verify="recaptchaVerified"
+                                    @expire="recaptchaExpired"
+                                    @fail="recaptchaFailed"
+                                    @error="recaptchaError"
+                                    ref="vueRecaptcha">
+                                </vue-recaptcha> -->
                                 <v-btn block variant="flat" color="#d5573b" align="center" class="rounded-pill py-6" @click="signup();">
                                     Создать аккаунт
                                 </v-btn>
@@ -123,16 +133,19 @@ const { xs, sm, smAndDown, smAndUp, md, mdAndDown, mdAndUp, lg, lgAndDown, lgAnd
   
 <script>
 import * as fun from '@/functions.js'
+import vueRecaptcha from 'vue3-recaptcha2';
 
 export default {
     name: 'Sign',
-    props: {
-        place: Number,
-        name: String,
-        score: Number,
+    components: {
+        vueRecaptcha
     },
     data() {
         return {
+            recaptchaResponse: '',
+            showRecaptcha: true,
+		    loadingTimeout: 30000, // 30 seconds
+
             signup_active: false,
             loading: false,
             login: {
@@ -165,43 +178,57 @@ export default {
             }).then((response) => {
                 console.log(response);
                 this.loading = false;
-                if(response.status == 200) {
-                    this.$cookies.set('accessToken', response.data.accessToken);
-                    this.$cookies.set('refreshToken', response.data.refreshToken);
-                    fun.show(this, 'Успешный вход в аккаунт', true);
-                    // this.emit_closing();
-                    this.$router.push('/wallet');
-                }
-                else{
-                    fun.show(this, 'Произошла неизвестная ошибка');
-                }
+
+                this.$cookies.set('accessToken', response.data.accessToken);
+                this.$cookies.set('refreshToken', response.data.refreshToken);
+                fun.show(this, 'Успешный вход в аккаунт', true);
+                // this.emit_closing();
+                this.$router.push('/wallet');
             }).catch((error) => {
-                fun.show(this, 'Произошла неизвестная ошибка');
+                fun.show(this, 'Введены некорректные данные');
             });
         },
         signup() {
-            this.loading = true;
-            this.axios({
-                method: 'post',
-                url: `${fun.SERVER_URL}/authentication/register`,
-                data: {
-                    username: this.signup_form.username,
-                    email: this.signup_form.email,
-                    password: this.signup_form.password
-                }
-            }).then((response) => {
-                console.log(response);
-                this.loading = false;
-                if(response.status == 200) {
-                    fun.show(this, 'Успешная регистрация', true);
-                    this.change_form();
-                }
-                else{
+            // if(recaptchaResponse && recaptchaResponse.length > 0){
+                this.loading = true;
+                this.axios({
+                    method: 'post',
+                    url: `${fun.SERVER_URL}/authentication/register`,
+                    data: {
+                        username: this.signup_form.username,
+                        email: this.signup_form.email,
+                        password: this.signup_form.password
+                    }
+                }).then((response) => {
+                    console.log(response);
+                    this.loading = false;
+                    if(response.status == 200) {
+                        fun.show(this, 'Успешная регистрация', true);
+                        this.change_form();
+                    }
+                    else{
+                        fun.show(this, 'Произошла неизвестная ошибка');
+                    }
+                }).catch((error) => {
                     fun.show(this, 'Произошла неизвестная ошибка');
-                }
-            }).catch((error) => {
-                fun.show(this, 'Произошла неизвестная ошибка');
-            });
+                });
+            // }
+            // else{
+            //     fun.show(this, 'Пожалуйста, подтвердите, что вы не робот');
+            // }
+        },
+
+        recaptchaVerified(response) {
+            this.recaptchaResponse = '';
+        },
+        recaptchaExpired() {
+            this.$refs.vueRecaptcha.reset();
+        },
+        recaptchaFailed() {
+            fun.show(this, "Произошла ошибка");
+        },
+        recaptchaError(reason) {
+            fun.show(this, reason);
         },
     },
     mounted(){

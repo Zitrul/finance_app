@@ -221,11 +221,11 @@
         </v-overlay>
 
         <v-overlay v-model="transactin_form_opened" class="align-center justify-center">
-            <TransactionForm @closed="transactin_form_opened = false; change_period(period_selected);"></TransactionForm>
+            <TransactionForm @closed="transactin_form_opened = false; change_period(period_selected); fetch_transactions();"></TransactionForm>
         </v-overlay>
         <v-overlay v-model="edit_transaction_form_opened" class="align-center justify-center">
             <TransactionForm :edit_mode="true" :Ename="edit_form.name" :Eprice="edit_form.price" :Ecategory_selected="edit_form.category" :Eid="edit_form.id"
-            @closed="edit_transaction_form_opened = false; change_period(period_selected);"></TransactionForm>
+            @closed="edit_transaction_form_opened = false; change_period(period_selected); fetch_transactions();"></TransactionForm>
         </v-overlay>
 
         <v-overlay v-model="income_transactin_form_opened" class="align-center justify-center">
