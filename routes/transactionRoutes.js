@@ -116,7 +116,7 @@ router.post("/scan-detected-qr", mid.authenticate, (req, res) => {
             params: {
                 user_id: req.user["id"],
                 qr_data: req.body.data,
-                auto_sort: false,
+                auto_sort: true,
             },
         })
         .then((response) => {
@@ -132,6 +132,7 @@ router.post("/scan-detected-qr", mid.authenticate, (req, res) => {
 router.post("/all-transactions", mid.authenticate, async (req, res) => {
     const period = req.body.period; // day | month | 3 months | 6 months | year | all
     const user_id = req.user["id"];
+    console.log(`\n\n\n\n\n\n\n\nTRANSACTION USER ID: ${user_id}\n\n\n\n\n\n\n\n`);
     const transactions = await charts.transactionsByPeriod(period, user_id);
 
     res.json(transactions);

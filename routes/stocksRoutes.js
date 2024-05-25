@@ -7,9 +7,9 @@ const axios = require("axios");
 
 router.post("/add-stocks", mid.authenticate, async (req, res) => {
     const user_id = req.user["id"];
-    const asset_amount = req.body.amount;
-    const stock_quote = req.body.ticker;
-    const news_subscription = req.body.news_sub || false;
+    const asset_amount = req.body.asset_amount;
+    const stock_quote = req.body.stock_quote;
+    const news_subscription = req.body.news_subscription || false;
 
     await axios
         .post(`http://${process.env.API_IP}:3214/add_user_assets`, null, {

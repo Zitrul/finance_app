@@ -26,12 +26,22 @@ async function transactionsByPeriod(period, user_id) {
     const transactions = await db.Transaction.findAll({
         where: {
             created_at: {
-                [sequelize.Op.lt]: new Date(),
-                [sequelize.Op.gt]: new Date(new Date() - miliseconds),
+                [sequelize.Op.between]: [new Date(new Date().getTime() - miliseconds), new Date()],
             },
             user_id: user_id,
         },
     });
+    // const current_date = new Date();
+    // const last_date = new Date(new Date().getTime() - miliseconds);
+    // const transactions = await sequelize.query(
+    //     "SELECT * FROM Transaction WHERE created_at BETWEEN startDate AND :endDate;",
+    //     { type: sequelize.QueryTypes.SELECT,
+    //         replacements: { startDate: last_date, endDate: current_date }
+    //     }
+    //   )
+    console.log('================================');
+    console.log(transactions.length);
+    console.log(transactions);
 
     return transactions.reverse();
 }
